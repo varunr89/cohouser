@@ -1,49 +1,150 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="utf-8">
-    <title>Blog Project</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <link rel="stylesheet" href="css/app.css">
+  <meta charset="utf-8">
+  <title>BCCA 2026 Budget Flow Analysis</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f9f9f9; }
+    .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 8px; }
+    h1 { color: #333; text-align: center; }
+    p { text-align: center; color: #666; }
+    #sankey-chart { width: 100%; height: 700px; }
+    .footer { margin-top: 20px; font-size: 0.8em; text-align: center; color: #888; }
+  </style>
 </head>
 <body>
 
-    <header>
-        <h1>Quest</h1>
-    </header>
-
-    <div class="container">
-    <main>
-
-    </main>
+<div class="container">
+  <h1>BCCA 2026 Budget Cash Flow</h1>
+  <p>Tracking every dollar from Member Dues to Departmental Line Items.</p>
+  <div id="sankey-chart"></div>
+  <div class="footer">
+    Data Source: 2026 BCCA Budget First Read.pdf | Interactive Visualization
+  </div>
 </div>
 
-<!-- start of new content -->
-<aside>
-    <h2>About Me</h2>
-	<p>I love Indian Food!</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, debitis earum molestias veniam suscipit aliquam totam exercitationem tempore neque vitae. Minima, corporis pariatur facere at quo porro beatae similique! Odit.</p>
-</aside>
-<!-- end of new content -->
+<script>
+  // Data Definition
+  // Nodes are indexed: 0: Dues, 1: Parking, 2: Donations, 3: Total Budget, etc.
+  // We use labels to automatically map them.
+  
+  const data = {
+    labels: [
+      "Member Dues", "Parking Fees", "CH Donations", "Total Budget Pot", // Sources & Main
+      "Reserves", "Utilities", "Finance", "Maintenance", "Board", "Common House", "Landscaping", "Meals", // Depts
+      "Natural Gas", "Water & Sewer", "Electricity", "Trash & Recycling", // Utility Items
+      "Insurance", "Reserve Study", "Acctg & Misc", // Finance Items
+      "Bldg Repairs & Unpredictable", "Grounds Maint", "Gutter Cleaning", "Sprinklers/Fire", "Other Maint", // Maint Items
+      "Internet & Tech", "Legal", "Retreat", "Training", "Other Board", // Board Items
+      "Cleaning", "Repairs", "Supplies", "Furnishings", "Other CH", // CH Items
+      "Tree Trimming", "Plants & Soil", "Other Landscape", // Landscape Items
+      "Community Celebrations", "Pantry" // Meals Items
+    ],
+    
+    // Define Flows: [Source Index, Target Index, Value]
+    flows: [
+      // Inflows to Total Budget (Index 3)
+      [0, 3, 282269], // Dues
+      [1, 3, 6121],   // Parking
+      [2, 3, 1350],   // Donations
+      
+      // Total Budget (3) to Departments
+      [3, 4, 117105], // Reserves
+      [3, 5, 86100],  // Utilities
+      [3, 6, 38419],  // Finance
+      [3, 7, 21050],  // Maintenance
+      [3, 8, 12197],  // Board
+      [3, 9, 8720],   // Common House (Gross)
+      [3, 10, 5050],  // Landscaping
+      [3, 11, 1100],  // Meals
+      
+      // Utilities (5) Breakdown
+      [5, 12, 28900], // Nat Gas
+      [5, 13, 27700], // Water
+      [5, 14, 21800], // Elec
+      [5, 15, 7700],  // Trash
+      
+      // Finance (6) Breakdown
+      [6, 16, 34729], // Insurance
+      [6, 17, 2640],  // Study
+      [6, 18, 1050],  // Misc
+      
+      // Maintenance (7) Breakdown
+      [7, 19, 11000], // Repairs/Unpred
+      [7, 20, 4050],  // Grounds
+      [7, 21, 2200],  // Gutters
+      [7, 22, 2000],  // Sprinklers
+      [7, 23, 1800],  // Other
+      
+      // Board (8) Breakdown
+      [8, 24, 5097],  // Tech
+      [8, 25, 2500],  // Legal
+      [8, 26, 1500],  // Retreat
+      [8, 27, 1450],  // Training
+      [8, 28, 1650],  // Other
+      
+      // Common House (9) Breakdown
+      [9, 29, 4500],  // Cleaning
+      [9, 30, 1200],  // Repairs
+      [9, 31, 850],   // Supplies
+      [9, 32, 825],   // Furnishings
+      [9, 33, 1345],  // Other
+      
+      // Landscaping (10) Breakdown
+      [10, 34, 3000], // Trees
+      [10, 35, 850],  // Plants
+      [10, 36, 1200], // Other
+      
+      // Meals (11) Breakdown
+      [11, 37, 750],  // Celebrations
+      [11, 38, 350]   // Pantry
+    ]
+  };
 
-    <footer>
-    <!-- start of new content -->
-    <section>
-        <h3 class="visuallyhidden">Social Links</h3>
-        <a class="social-link" href="https://twitter.com/udacity">
-            <img src="img/social-twitter.png" alt="Twitter">
-        </a>
-        <a class="social-link" href="https://www.instagram.com/udacity/">
-            <img src="img/social-instagram.png" alt="Instagram">
-        </a>
-        <a class="social-link" href="https://plus.google.com/+Udacity">
-            <img src="img/social-google.png" alt="Google Plus">
-        </a>
-    </section>
-    <!-- end of new content -->
-</footer>
+  // Helper to map source/target names to indices
+  const nodeMap = {};
+  data.labels.forEach((label, i) => nodeMap[i] = label);
+  
+  const sourceIndices = data.flows.map(f => f[0]);
+  const targetIndices = data.flows.map(f => f[1]);
+  const values = data.flows.map(f => f[2]);
 
-    <script src="js/app.js"></script>
+  const plotData = {
+    type: "sankey",
+    orientation: "h",
+    node: {
+      pad: 15,
+      thickness: 30,
+      line: { color: "black", width: 0.5 },
+      label: data.labels,
+      color: [
+        "#4e79a7", "#76b7b2", "#59a14f", "#e15759", // Sources
+        "#59a14f", "#edc948", "#f28e2b", "#e15759", "#4e79a7", "#b07aa1", "#ff9da7", "#9c755f", // Depts
+        "#edc948", "#edc948", "#edc948", "#edc948", // Utils items
+        "#f28e2b", "#f28e2b", "#f28e2b", // Fin items
+        "#e15759", "#e15759", "#e15759", "#e15759", "#e15759", // Maint items
+        "#4e79a7", "#4e79a7", "#4e79a7", "#4e79a7", "#4e79a7", // Board items
+        "#b07aa1", "#b07aa1", "#b07aa1", "#b07aa1", "#b07aa1", // CH items
+        "#ff9da7", "#ff9da7", "#ff9da7", // Land items
+        "#9c755f", "#9c755f" // Meals items
+      ]
+    },
+    link: {
+      source: sourceIndices,
+      target: targetIndices,
+      value: values
+    }
+  };
+
+  const layout = {
+    title: { text: "" },
+    font: { size: 12 },
+    margin: { l: 10, r: 10, t: 10, b: 10 }
+  };
+
+  Plotly.newPlot('sankey-chart', [plotData], layout, {responsive: true});
+</script>
+
 </body>
 </html>
