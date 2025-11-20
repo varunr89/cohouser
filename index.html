@@ -1,149 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>BCCA 2026 Budget Flow Analysis</title>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f9f9f9; }
-    .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 8px; }
-    h1 { color: #333; text-align: center; }
-    p { text-align: center; color: #666; }
-    #sankey-chart { width: 100%; height: 700px; }
-    .footer { margin-top: 20px; font-size: 0.8em; text-align: center; color: #888; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCCA Budget Analysis Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f9; color: #333; }
+        .header { background-color: #2c3e50; color: white; padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 1.8rem; }
+        .header p { margin: 5px 0 0; font-size: 0.9rem; opacity: 0.8; }
+        
+        /* Tabs */
+        .tab-container { max-width: 1200px; margin: 20px auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; }
+        .tabs { display: flex; background-color: #ecf0f1; border-bottom: 1px solid #bdc3c7; }
+        .tab-button { flex: 1; padding: 15px; border: none; background: none; cursor: pointer; font-size: 1rem; font-weight: 600; color: #7f8c8d; transition: all 0.3s ease; }
+        .tab-button:hover { background-color: #dfe6e9; color: #2c3e50; }
+        .tab-button.active { background-color: white; color: #2c3e50; border-top: 4px solid #3498db; }
+        
+        /* Content */
+        .tab-content { display: none; padding: 20px; animation: fadeIn 0.5s; }
+        .tab-content.active { display: block; }
+        .chart-container { width: 100%; height: 700px; margin-bottom: 30px; }
+        .chart-half-container { width: 100%; height: 500px; margin-bottom: 30px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #3498db; }
+        .stat-val { font-size: 1.5rem; font-weight: bold; color: #2c3e50; }
+        .stat-label { font-size: 0.85rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>BCCA 2026 Budget Cash Flow</h1>
-  <p>Tracking every dollar from Member Dues to Departmental Line Items.</p>
-  <div id="sankey-chart"></div>
-  <div class="footer">
-    Data Source: 2026 BCCA Budget First Read.pdf | Interactive Visualization
-  </div>
+<div class="header">
+    <h1>BCCA Budget Analysis Dashboard</h1>
+    [cite_start]<p>Interactive Financial Analysis for 2025 Approved vs. 2026 Proposed Budgets [cite: 148, 152]</p>
+</div>
+
+<div class="tab-container">
+    <div class="tabs">
+        <button class="tab-button" onclick="openTab(event, 'tab-2025')">2025 Analysis (Baseline)</button>
+        <button class="tab-button active" onclick="openTab(event, 'tab-2026')">2026 Analysis (Proposed)</button>
+        <button class="tab-button" onclick="openTab(event, 'tab-compare')">Variance & Comparison</button>
+    </div>
+
+    <div id="tab-2025" class="tab-content">
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-val">$260,391</div><div class="stat-label">Total Net Assessment</div></div>
+            <div class="stat-card"><div class="stat-val">$110,580</div><div class="stat-label">Reserves Contribution</div></div>
+            <div class="stat-card"><div class="stat-val">$77,850</div><div class="stat-label">Utilities Cost</div></div>
+        </div>
+        <h3>2025 Budget Flow</h3>
+        <div id="sankey-2025" class="chart-container"></div>
+    </div>
+
+    <div id="tab-2026" class="tab-content active">
+        <div class="stats-grid">
+            <div class="stat-card" style="border-color: #e74c3c;"><div class="stat-val">$282,269</div><div class="stat-label">Total Net Assessment (+8.4%)</div></div>
+            <div class="stat-card"><div class="stat-val">$117,105</div><div class="stat-label">Reserves Contribution (+6%)</div></div>
+            <div class="stat-card" style="border-color: #e74c3c;"><div class="stat-val">$86,100</div><div class="stat-label">Utilities Cost (+11%)</div></div>
+        </div>
+        <h3>2026 Proposed Budget Flow</h3>
+        <div id="sankey-2026" class="chart-container"></div>
+    </div>
+
+    <div id="tab-compare" class="tab-content">
+        <h3>Budget Increase Bridge (Waterfall)</h3>
+        [cite_start]<p>Tracking the $21,878 increase from 2025 to 2026 by category[cite: 157].</p>
+        <div id="waterfall-chart" class="chart-half-container"></div>
+        
+        <h3>Departmental Comparison</h3>
+        <div id="bar-chart" class="chart-half-container"></div>
+    </div>
 </div>
 
 <script>
-  // Data Definition
-  // Nodes are indexed: 0: Dues, 1: Parking, 2: Donations, 3: Total Budget, etc.
-  // We use labels to automatically map them.
-  
-  const data = {
-    labels: [
-      "Member Dues", "Parking Fees", "CH Donations", "Total Budget Pot", // Sources & Main
-      "Reserves", "Utilities", "Finance", "Maintenance", "Board", "Common House", "Landscaping", "Meals", // Depts
-      "Natural Gas", "Water & Sewer", "Electricity", "Trash & Recycling", // Utility Items
-      "Insurance", "Reserve Study", "Acctg & Misc", // Finance Items
-      "Bldg Repairs & Unpredictable", "Grounds Maint", "Gutter Cleaning", "Sprinklers/Fire", "Other Maint", // Maint Items
-      "Internet & Tech", "Legal", "Retreat", "Training", "Other Board", // Board Items
-      "Cleaning", "Repairs", "Supplies", "Furnishings", "Other CH", // CH Items
-      "Tree Trimming", "Plants & Soil", "Other Landscape", // Landscape Items
-      "Community Celebrations", "Pantry" // Meals Items
-    ],
-    
-    // Define Flows: [Source Index, Target Index, Value]
-    flows: [
-      // Inflows to Total Budget (Index 3)
-      [0, 3, 282269], // Dues
-      [1, 3, 6121],   // Parking
-      [2, 3, 1350],   // Donations
-      
-      // Total Budget (3) to Departments
-      [3, 4, 117105], // Reserves
-      [3, 5, 86100],  // Utilities
-      [3, 6, 38419],  // Finance
-      [3, 7, 21050],  // Maintenance
-      [3, 8, 12197],  // Board
-      [3, 9, 8720],   // Common House (Gross)
-      [3, 10, 5050],  // Landscaping
-      [3, 11, 1100],  // Meals
-      
-      // Utilities (5) Breakdown
-      [5, 12, 28900], // Nat Gas
-      [5, 13, 27700], // Water
-      [5, 14, 21800], // Elec
-      [5, 15, 7700],  // Trash
-      
-      // Finance (6) Breakdown
-      [6, 16, 34729], // Insurance
-      [6, 17, 2640],  // Study
-      [6, 18, 1050],  // Misc
-      
-      // Maintenance (7) Breakdown
-      [7, 19, 11000], // Repairs/Unpred
-      [7, 20, 4050],  // Grounds
-      [7, 21, 2200],  // Gutters
-      [7, 22, 2000],  // Sprinklers
-      [7, 23, 1800],  // Other
-      
-      // Board (8) Breakdown
-      [8, 24, 5097],  // Tech
-      [8, 25, 2500],  // Legal
-      [8, 26, 1500],  // Retreat
-      [8, 27, 1450],  // Training
-      [8, 28, 1650],  // Other
-      
-      // Common House (9) Breakdown
-      [9, 29, 4500],  // Cleaning
-      [9, 30, 1200],  // Repairs
-      [9, 31, 850],   // Supplies
-      [9, 32, 825],   // Furnishings
-      [9, 33, 1345],  // Other
-      
-      // Landscaping (10) Breakdown
-      [10, 34, 3000], // Trees
-      [10, 35, 850],  // Plants
-      [10, 36, 1200], // Other
-      
-      // Meals (11) Breakdown
-      [11, 37, 750],  // Celebrations
-      [11, 38, 350]   // Pantry
-    ]
-  };
+    // --- DATA DEFINITIONS ---
 
-  // Helper to map source/target names to indices
-  const nodeMap = {};
-  data.labels.forEach((label, i) => nodeMap[i] = label);
-  
-  const sourceIndices = data.flows.map(f => f[0]);
-  const targetIndices = data.flows.map(f => f[1]);
-  const values = data.flows.map(f => f[2]);
+    // 2025 Data
+    const data2025 = {
+        labels: ["Member Dues", "Parking Income", "CH Donations", "Total Budget", "Reserves", "Utilities", "Finance", "Maintenance", "Board", "Common House", "Landscaping", "Meals", "Natural Gas", "Water & Sewer", "Electricity", "Trash & Recycling", "Insurance", "Review/Audit", "Other Finance", "Repairs & Unpred", "Grounds/Pest", "Gutter Clean", "Upper Stairs", "Sprinklers", "Other Maint", "Internet & Tech", "Legal", "Retreats", "Child Care", "Other Board", "Cleaning", "Repairs", "Supplies", "Furnishings", "Other CH", "Tree Trimming", "Tools", "Plants/Fert", "Other Land", "Celebrations", "Pantry"],
+        flows: [
+            [0, 3, 260391], [1, 3, 6061], [2, 3, 1300], // Sources
+            [3, 4, 110580], [3, 5, 77850], [3, 6, 37010], [3, 7, 18935], [3, 8, 10927], [3, 9, 8350], [3, 10, 3150], [3, 11, 950], // Depts
+            [5, 12, 24300], [5, 13, 25900], [5, 14, 20200], [5, 15, 7450], // Utils
+            [6, 16, 33600], [6, 17, 2475], [6, 18, 935], // Fin
+            [7, 19, 7000], [7, 20, 4860], [7, 21, 1600], [7, 22, 1500], [7, 23, 1150], [7, 24, 2825], // Maint
+            [8, 25, 4792], [8, 26, 2500], [8, 27, 1500], [8, 28, 900], [8, 29, 1235], // Board
+            [9, 30, 4425], [9, 31, 1000], [9, 32, 800], [9, 33, 600], [9, 34, 1525], // CH
+            [10, 35, 1000], [10, 36, 500], [10, 37, 650], [10, 38, 1000], // Land
+            [11, 39, 600], [11, 40, 350] // Meals
+        ]
+    };
 
-  const plotData = {
-    type: "sankey",
-    orientation: "h",
-    node: {
-      pad: 15,
-      thickness: 30,
-      line: { color: "black", width: 0.5 },
-      label: data.labels,
-      color: [
-        "#4e79a7", "#76b7b2", "#59a14f", "#e15759", // Sources
-        "#59a14f", "#edc948", "#f28e2b", "#e15759", "#4e79a7", "#b07aa1", "#ff9da7", "#9c755f", // Depts
-        "#edc948", "#edc948", "#edc948", "#edc948", // Utils items
-        "#f28e2b", "#f28e2b", "#f28e2b", // Fin items
-        "#e15759", "#e15759", "#e15759", "#e15759", "#e15759", // Maint items
-        "#4e79a7", "#4e79a7", "#4e79a7", "#4e79a7", "#4e79a7", // Board items
-        "#b07aa1", "#b07aa1", "#b07aa1", "#b07aa1", "#b07aa1", // CH items
-        "#ff9da7", "#ff9da7", "#ff9da7", // Land items
-        "#9c755f", "#9c755f" // Meals items
-      ]
-    },
-    link: {
-      source: sourceIndices,
-      target: targetIndices,
-      value: values
+    // 2026 Data (From previous step)
+    const data2026 = {
+        labels: ["Member Dues", "Parking Fees", "CH Donations", "Total Budget", "Reserves", "Utilities", "Finance", "Maintenance", "Board", "Common House", "Landscaping", "Meals", "Natural Gas", "Water & Sewer", "Electricity", "Trash & Recycling", "Insurance", "Reserve Study", "Acctg & Misc", "Bldg Repairs & Unpred", "Grounds Maint", "Gutter Cleaning", "Sprinklers/Fire", "Other Maint", "Internet & Tech", "Legal", "Retreat", "Training", "Other Board", "Cleaning", "Repairs", "Supplies", "Furnishings", "Other CH", "Tree Trimming", "Plants & Soil", "Other Landscape", "Celebrations", "Pantry"],
+        flows: [
+            [0, 3, 282269], [1, 3, 6121], [2, 3, 1350], 
+            [3, 4, 117105], [3, 5, 86100], [3, 6, 38419], [3, 7, 21050], [3, 8, 12197], [3, 9, 8720], [3, 10, 5050], [3, 11, 1100],
+            [5, 12, 28900], [5, 13, 27700], [5, 14, 21800], [5, 15, 7700],
+            [6, 16, 34729], [6, 17, 2640], [6, 18, 1050],
+            [7, 19, 11000], [7, 20, 4050], [7, 21, 2200], [7, 22, 2000], [7, 23, 1800],
+            [8, 24, 5097], [8, 25, 2500], [8, 26, 1500], [8, 27, 1450], [8, 28, 1650],
+            [9, 29, 4500], [9, 30, 1200], [9, 31, 850], [9, 32, 825], [9, 33, 1345],
+            [10, 34, 3000], [10, 35, 850], [10, 36, 1200],
+            [11, 37, 750], [11, 38, 350]
+        ]
+    };
+
+    // --- RENDERING FUNCTIONS ---
+
+    function renderSankey(divId, data, colorScale) {
+        const plotData = {
+            type: "sankey",
+            orientation: "h",
+            node: {
+                pad: 15, thickness: 20, line: { color: "black", width: 0.5 },
+                label: data.labels,
+                color: colorScale
+            },
+            link: {
+                source: data.flows.map(f => f[0]),
+                target: data.flows.map(f => f[1]),
+                value: data.flows.map(f => f[2])
+            }
+        };
+        Plotly.newPlot(divId, [plotData], { margin: { l: 10, r: 10, t: 20, b: 20 }, font: { size: 12 } }, {responsive: true});
     }
-  };
 
-  const layout = {
-    title: { text: "" },
-    font: { size: 12 },
-    margin: { l: 10, r: 10, t: 10, b: 10 }
-  };
+    function renderCharts() {
+        // Colors
+        const colors2025 = ["#bdc3c7", "#95a5a6", "#95a5a6", "#7f8c8d", "#2ecc71", "#f1c40f", "#e67e22", "#e74c3c", "#3498db", "#9b59b6", "#1abc9c", "#34495e"];
+        const colors2026 = ["#3498db", "#2980b9", "#2980b9", "#2c3e50", "#2ecc71", "#f1c40f", "#e67e22", "#e74c3c", "#3498db", "#9b59b6", "#1abc9c", "#34495e"];
 
-  Plotly.newPlot('sankey-chart', [plotData], layout, {responsive: true});
+        renderSankey('sankey-2025', data2025, colors2025);
+        renderSankey('sankey-2026', data2026, colors2026);
+
+        // Waterfall Chart Data
+        const waterfallData = {
+            type: "waterfall",
+            x: ["2025 Budget", "Utilities", "Reserves", "Maintenance", "Landscaping", "Finance", "Board", "Other", "2026 Budget"],
+            text: ["$260k", "+$8,250", "+$6,524", "+$2,115", "+$1,900", "+$1,409", "+$1,270", "+$410", "$282k"],
+            measure: ["absolute", "relative", "relative", "relative", "relative", "relative", "relative", "relative", "total"],
+            y: [260391, 8250, 6524, 2115, 1900, 1409, 1270, 410, 0],
+            connector: { line: { color: "rgb(63, 63, 63)" } },
+            decreasing: { marker: { color: "#2ecc71" } },
+            increasing: { marker: { color: "#e74c3c" } },
+            totals: { marker: { color: "#2c3e50" } }
+        };
+        Plotly.newPlot('waterfall-chart', [waterfallData], { title: {text: ""}, yaxis: {range: [250000, 290000]} }, {responsive: true});
+
+        // Grouped Bar Chart Data
+        const depts = ["Reserves", "Utilities", "Finance", "Maintenance", "Board", "Common House", "Landscaping", "Meals"];
+        const val2025 = [110580, 77850, 37010, 18935, 10927, 7050, 3150, 950];
+        const val2026 = [117105, 86100, 38419, 21050, 12197, 7370, 5050, 1100];
+
+        const trace1 = { x: depts, y: val2025, name: '2025', type: 'bar', marker: {color: '#bdc3c7'} };
+        const trace2 = { x: depts, y: val2026, name: '2026', type: 'bar', marker: {color: '#2980b9'} };
+        
+        Plotly.newPlot('bar-chart', [trace1, trace2], { barmode: 'group', margin: {t:20} }, {responsive: true});
+    }
+
+    // Tab Switching Logic
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) { tabcontent[i].style.display = "none"; tabcontent[i].classList.remove("active"); }
+        tablinks = document.getElementsByClassName("tab-button");
+        for (i = 0; i < tablinks.length; i++) { tablinks[i].className = tablinks[i].className.replace(" active", ""); }
+        document.getElementById(tabName).style.display = "block";
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.className += " active";
+        
+        // Trigger resize for Plotly to fit new container
+        window.dispatchEvent(new Event('resize'));
+    }
+
+    // Init
+    renderCharts();
 </script>
 
 </body>
