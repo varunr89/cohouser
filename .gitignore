@@ -1,2 +1,6 @@
 project.docx
 course-git-blog-project
+
+# Ignore all PDF files in any directory
+*.pdf
+**/*.pdf
