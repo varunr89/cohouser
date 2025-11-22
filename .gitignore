@@ -4,3 +4,6 @@ course-git-blog-project
 # Ignore all PDF files in any directory
 *.pdf
 **/*.pdf
+
+# macOS system files
+.DS_Store
