@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wild Whatcom Financial Dashboard">
+    <title>Wild Whatcom Financial Dashboard</title>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Prop-Types (Required by Recharts) -->
+    <script src="https://unpkg.com/prop-types@15.6/prop-types.min.js"></script>
+
+    <!-- Recharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.3/Recharts.min.js"></script>
+
+    <!-- Plotly.js for Sankey -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <!-- Data (Loaded as Global Variable for simple static access) -->
+    <script src="src/data/financial_data.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card-header { background-color: white; border-bottom: 1px solid #f0f0f0; padding: 15px 20px; border-radius: 12px 12px 0 0 !important; font-weight: 600; }
+        .stat-card { text-align: center; padding: 20px; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #2c3e50; }
+        .stat-label { color: #7f8c8d; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-bar { background-color: #2c3e50; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-back-btn { color: #ecf0f1; text-decoration: none; font-weight: 500; }
+        .nav-back-btn:hover { color: #3498db; }
+        .chart-container { height: 500px; width: 100%; }
+        .filter-bar { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 20px; align-items: center; }
+        .loading { text-align: center; padding: 50px; font-size: 1.2rem; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+    <div class="nav-bar">
+        <div class="d-flex align-items-center gap-3">
+            <a href="index.html" class="nav-back-btn">← Back to Portal</a>
+            <h4 class="m-0">Wild Whatcom Financial Dashboard</h4>
+        </div>
+    </div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        // Access Recharts from global window object
+        const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = window.Recharts;
+
+        const FinancialDashboard = () => {
+            // Initialize with the data directly to avoid fetch/CORS issues during local verification
+            // In a real deployed environment, fetch is preferred, but for this prototype to work
+            // seamlessly both locally and on GitHub Pages without a server, we'll try to use a global
+            // if available, or fetch as fallback.
+
+            const [data, setData] = useState(null);
+            const [selectedYear, setSelectedYear] = useState('FY25 Actuals');
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+
+            useEffect(() => {
+                // Use global data if available (loaded via script tag)
+                if (window.FINANCIAL_DATA) {
+                    setData(window.FINANCIAL_DATA);
+                    setLoading(false);
+                } else {
+                    // Fallback to fetch if not defined globally (though script tag should handle it)
+                    fetch('src/data/financial_data.json')
+                        .then(response => {
+                            if (!response.ok) throw new Error('Failed to load data');
+                            return response.json();
+                        })
+                        .then(jsonData => {
+                            setData(jsonData);
+                            setLoading(false);
+                        })
+                        .catch(err => {
+                            console.error("Fetch error:", err);
+                            setError("Could not load data. Please ensure src/data/financial_data.js is loaded.");
+                            setLoading(false);
+                        });
+                }
+            }, []);
+
+            const availableYears = useMemo(() => {
+                if (!data || !data.annual_data) return [];
+                return Object.keys(data.annual_data).sort().reverse();
+            }, [data]);
+
+            const yearData = useMemo(() => {
+                if (!data || !selectedYear) return null;
+                return data.annual_data[selectedYear];
+            }, [data, selectedYear]);
+
+            const summaryStats = useMemo(() => {
+                if (!yearData) return { revenue: 0, expenses: 0, net: 0 };
+
+                const totalRev = Object.values(yearData.Revenue || {}).reduce((a, b) => a + b, 0);
+                const totalExp = Object.values(yearData.Expenses || {}).reduce((a, b) => a + b, 0);
+
+                return {
+                    revenue: totalRev,
+                    expenses: totalExp,
+                    net: totalRev - totalExp
+                };
+            }, [yearData]);
+
+            useEffect(() => {
+                if (yearData) {
+                    renderSankey();
+                }
+            }, [yearData]);
+
+            const renderSankey = () => {
+                if (!yearData) return;
+
+                const revenueItems = Object.entries(yearData.Revenue || {}).filter(([_, v]) => v > 0);
+                const expenseItems = Object.entries(yearData.Expenses || {}).filter(([_, v]) => v > 0);
+
+                // Nodes: 0..N (Rev items), N+1 (Budget), N+2..M (Exp items)
+                const revNodes = revenueItems.map(i => i[0]);
+                const expNodes = expenseItems.map(i => i[0]);
+                const labels = [...revNodes, "Total Budget", ...expNodes];
+
+                const budgetNodeIdx = revNodes.length;
+
+                // Links
+                const source = [];
+                const target = [];
+                const values = [];
+                const colors = [];
+
+                // Revenue -> Budget
+                revenueItems.forEach((item, idx) => {
+                    source.push(idx);
+                    target.push(budgetNodeIdx);
+                    values.push(item[1]);
+                    colors.push("#2ecc71"); // Green for income
+                });
+
+                // Budget -> Expenses
+                expenseItems.forEach((item, idx) => {
+                    source.push(budgetNodeIdx);
+                    target.push(budgetNodeIdx + 1 + idx);
+                    values.push(item[1]);
+                    colors.push("#e74c3c"); // Red for expense
+                });
+
+                const plotData = {
+                    type: "sankey",
+                    orientation: "h",
+                    valueformat: "$,.0f",
+                    node: {
+                        pad: 15,
+                        thickness: 20,
+                        line: { color: "black", width: 0.5 },
+                        label: labels,
+                        color: labels.map((_, i) => i === budgetNodeIdx ? "#3498db" : (i < budgetNodeIdx ? "#2ecc71" : "#e74c3c"))
+                    },
+                    link: {
+                        source: source,
+                        target: target,
+                        value: values
+                    }
+                };
+
+                const layout = {
+                    font: { size: 12 },
+                    margin: { l: 10, r: 10, t: 20, b: 20 },
+                    height: 600
+                };
+
+                Plotly.newPlot('sankey-chart', [plotData], layout, {responsive: true});
+            };
+
+            // Prepare Comparison Data
+            const comparisonData = useMemo(() => {
+                if (!data) return [];
+                const years = Object.keys(data.annual_data).sort(); // Chronological
+
+                return years.map(year => {
+                    const r = Object.values(data.annual_data[year].Revenue || {}).reduce((a, b) => a + b, 0);
+                    const e = Object.values(data.annual_data[year].Expenses || {}).reduce((a, b) => a + b, 0);
+                    return {
+                        name: year.replace(" Actuals", "").replace(" Budget", ""),
+                        Revenue: r,
+                        Expenses: e,
+                        Net: r - e
+                    };
+                });
+            }, [data]);
+
+            if (loading) return <div className="loading">Loading financial data...</div>;
+            if (error) return <div className="loading text-danger">Error: {error}</div>;
+
+            return (
+                <div className="dashboard-container">
+
+                    {/* Controls */}
+                    <div className="filter-bar">
+                        <label className="fw-bold">Select Fiscal Year:</label>
+                        <select
+                            className="form-select w-auto"
+                            value={selectedYear}
+                            onChange={(e) => setSelectedYear(e.target.value)}
+                        >
+                            {availableYears.map(y => <option key={y} value={y}>{y}</option>)}
+                        </select>
+                        <span className="text-muted ms-auto small">Data generated from Annual CSV</span>
+                    </div>
+
+                    {/* Summary Cards */}
+                    <div className="row g-4 mb-4">
+                        <div className="col-md-4">
+                            <div className="card stat-card">
+                                <div className="stat-value text-success">${summaryStats.revenue.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                                <div className="stat-label">Total Revenue</div>
+                            </div>
+                        </div>
+                        <div className="col-md-4">
+                            <div className="card stat-card">
+                                <div className="stat-value text-danger">${summaryStats.expenses.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                                <div className="stat-label">Total Expenses</div>
+                            </div>
+                        </div>
+                        <div className="col-md-4">
+                            <div className="card stat-card">
+                                <div className="stat-value" style={{color: summaryStats.net >= 0 ? '#2ecc71' : '#e74c3c'}}>
+                                    ${summaryStats.net.toLocaleString(undefined, {maximumFractionDigits: 0})}
+                                </div>
+                                <div className="stat-label">Net Position</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sankey Flow */}
+                    <div className="card">
+                        <div className="card-header">
+                            Financial Flow ({selectedYear})
+                        </div>
+                        <div className="card-body">
+                            <div id="sankey-chart" className="chart-container" style={{height: '600px'}}></div>
+                            <p className="text-center text-muted mt-2 small">
+                                Left: Revenue Sources &rarr; Center: Total Budget &rarr; Right: Expenses
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Historical Comparison */}
+                    <div className="card">
+                        <div className="card-header">
+                            Historical Financial Performance
+                        </div>
+                        <div className="card-body" style={{height: '400px'}}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                    data={comparisonData}
+                                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" />
+                                    <YAxis tickFormatter={(value) => `$${value / 1000}k`} />
+                                    <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+                                    <Legend />
+                                    <Bar dataKey="Revenue" fill="#2ecc71" />
+                                    <Bar dataKey="Expenses" fill="#e74c3c" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    {/* Detailed Drilldown */}
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="card h-100">
+                                <div className="card-header">Revenue Breakdown</div>
+                                <div className="card-body overflow-auto" style={{maxHeight: '400px'}}>
+                                    <table className="table table-sm table-hover">
+                                        <thead><tr><th>Category</th><th className="text-end">Amount</th><th className="text-end">%</th></tr></thead>
+                                        <tbody>
+                                            {Object.entries(yearData?.Revenue || {})
+                                                .sort((a,b) => b[1] - a[1])
+                                                .map(([cat, val]) => (
+                                                <tr key={cat}>
+                                                    <td>{cat}</td>
+                                                    <td className="text-end">${val.toLocaleString()}</td>
+                                                    <td className="text-end">{(val / summaryStats.revenue * 100).toFixed(1)}%</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="card h-100">
+                                <div className="card-header">Expense Breakdown</div>
+                                <div className="card-body overflow-auto" style={{maxHeight: '400px'}}>
+                                    <table className="table table-sm table-hover">
+                                        <thead><tr><th>Category</th><th className="text-end">Amount</th><th className="text-end">%</th></tr></thead>
+                                        <tbody>
+                                            {Object.entries(yearData?.Expenses || {})
+                                                .sort((a,b) => b[1] - a[1])
+                                                .map(([cat, val]) => (
+                                                <tr key={cat}>
+                                                    <td>{cat}</td>
+                                                    <td className="text-end">${val.toLocaleString()}</td>
+                                                    <td className="text-end">{(val / summaryStats.expenses * 100).toFixed(1)}%</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<FinancialDashboard />);
+    </script>
+</body>
+</html>
