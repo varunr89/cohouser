@@ -1,0 +1,9 @@
+{
+  "client_id": "your-intuit-client-id",
+  "client_secret": "your-intuit-client-secret",
+  "realm_id": "your-quickbooks-company-id",
+  "azure_storage_connection_string": "your-azure-storage-connection-string",
+  "access_token": null,
+  "refresh_token": null,
+  "token_expiry": null
+}
