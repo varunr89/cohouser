@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BCCA Finance Dashboard – Q1 2025 Drilldown Mock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card-bg: #ffffff;
+      --border-subtle: #e2e8f0;
+      --accent: #275d8c;
+      --accent-soft: #e0edff;
+      --accent-softer: #f3f7ff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --danger: #b91c1c;
+      --success: #166534;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #eef3ff 0, #f5f7fb 45%, #f9fafb 100%);
+      color: var(--text-main);
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      padding: 1.25rem 2.4rem;
+      background: linear-gradient(135deg, #163457, #275d8c);
+      color: #f9fafb;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .app-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .app-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .app-subtitle {
+      font-size: 0.9rem;
+      color: #d1e3ff;
+      margin-top: 0.15rem;
+    }
+
+    .header-pill {
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius-pill);
+      background: rgba(15, 23, 42, 0.35);
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+
+    .header-pill span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #4ade80;
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25);
+    }
+
+    .app-main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.75rem 2.4rem 2.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Cash summary cards -------------------------------------------------- */
+
+    .section-heading {
+      margin: 0 0 0.25rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .section-subheading {
+      margin: 0 0 0.8rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .cash-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .cash-card {
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 0.9rem 1.1rem;
+      background: linear-gradient(135deg, #ffffff, #f5f7ff);
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      transition:
+        transform 0.1s ease-out,
+        box-shadow 0.1s ease-out,
+        border-color 0.12s ease-out,
+        background 0.15s ease-out;
+    }
+
+    .cash-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.18);
+      border-color: #bfdbfe;
+      background: linear-gradient(135deg, #ffffff, #edf4ff);
+    }
+
+    .cash-card.active {
+      border-color: #2563eb;
+      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.4);
+      background: linear-gradient(135deg, #f9fbff, #e0edff);
+    }
+
+    .cash-card-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .cash-card-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-top: 0.15rem;
+    }
+
+    .cash-card-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .cash-card-chip {
+      font-size: 0.75rem;
+      border-radius: var(--radius-pill);
+      padding: 0.2rem 0.6rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .cash-card-chip.negative {
+      background: rgba(248, 113, 113, 0.1);
+      color: var(--danger);
+    }
+
+    .cash-card-footnote {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Drilldown containers ----------------------------------------------- */
+
+    .drill-card {
+      margin-top: 0.9rem;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      padding: 1rem 1.1rem 1.15rem;
+    }
+
+    .drill-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      align-items: flex-start;
+      margin-bottom: 0.6rem;
+    }
+
+    .drill-header-main h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .drill-header-main p {
+      margin: 0.25rem 0 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .drill-header-tag {
+      font-size: 0.76rem;
+      border-radius: var(--radius-pill);
+      padding: 0.2rem 0.65rem;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      color: var(--text-muted);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .drill-header-tag span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .drill-container {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      overflow: hidden;
+      background: #f9fafb;
+      font-size: 0.8rem;
+    }
+
+    .drill-header-row,
+    .drill-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.45rem 0.75rem;
+    }
+
+    .drill-header-row {
+      background: #eef2ff;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #1f2937;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+    }
+
+    .drill-header-row .drill-col-label:first-child {
+      flex: 1;
+    }
+
+    .drill-col-label {
+      min-width: 90px;
+      text-align: right;
+    }
+
+    .drill-body {
+      max-height: 320px;
+      overflow: auto;
+    }
+
+    .drill-row {
+      border-top: 1px solid rgba(229, 231, 235, 0.8);
+    }
+
+    .drill-row:nth-child(odd) {
+      background: #f9fafb;
+    }
+
+    .drill-row:nth-child(even) {
+      background: #fdfdfd;
+    }
+
+    .drill-row.open {
+      background: #eef2ff;
+    }
+
+    .drill-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .drill-toggle {
+      width: 1.1rem;
+      height: 1.1rem;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0.2rem;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .drill-toggle::before {
+      content: "▸";
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      transition: transform 0.16s ease-out, color 0.16s ease-out;
+    }
+
+    .drill-row.open .drill-toggle::before {
+      transform: rotate(90deg);
+      color: #1d4ed8;
+    }
+
+    .drill-toggle.is-leaf {
+      cursor: default;
+    }
+
+    .drill-toggle.is-leaf::before {
+      content: "•";
+      font-size: 0.55rem;
+      color: var(--text-muted);
+      transform: none;
+    }
+
+    .drill-label {
+      font-size: 0.8rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .drill-cell {
+      min-width: 90px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .drill-cell-change-positive {
+      color: var(--success);
+    }
+
+    .drill-cell-change-negative {
+      color: var(--danger);
+    }
+
+    .drill-children {
+      display: none;
+    }
+
+    .drill-row + .drill-children {
+      border-top: 0;
+    }
+
+    /* Committee layout ---------------------------------------------------- */
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .sidebar {
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: var(--radius-lg);
+      padding: 1rem 0.95rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 640px;
+      position: sticky;
+      top: 90px;
+    }
+
+    .sidebar-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .sidebar-caption {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .committee-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.15rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      overflow-y: auto;
+    }
+
+    .committee-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.5rem 0.65rem;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.08s ease,
+        box-shadow 0.08s ease;
+    }
+
+    .committee-item:hover {
+      background: var(--accent-softer);
+      border-color: var(--accent-soft);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(148, 163, 184, 0.35);
+    }
+
+    .committee-item.active {
+      background: var(--accent);
+      color: #f9fafb;
+      border-color: rgba(15, 23, 42, 0.4);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.55);
+    }
+
+    .committee-item.active .committee-chip {
+      background: rgba(15, 23, 42, 0.2);
+      color: #e0ecff;
+    }
+
+    .committee-chip {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-pill);
+      background: var(--accent-soft);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .main-panel {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: var(--radius-lg);
+      padding: 1.15rem 1.3rem 1.25rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      align-items: flex-start;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      padding-bottom: 0.7rem;
+    }
+
+    .panel-header-main h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .panel-header-main p {
+      margin: 0.22rem 0 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .panel-tag {
+      font-size: 0.76rem;
+      border-radius: var(--radius-pill);
+      padding: 0.25rem 0.7rem;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      color: var(--text-muted);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .panel-tag span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .metric-card {
+      background: #f9fafb;
+      border-radius: var(--radius-md);
+      padding: 0.8rem 0.9rem;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+    }
+
+    .metric-label {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .metric-value {
+      font-size: 1.02rem;
+      font-weight: 600;
+    }
+
+    .metric-sub {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .metric-pill {
+      margin-top: 0.2rem;
+      font-size: 0.72rem;
+      border-radius: var(--radius-pill);
+      padding: 0.16rem 0.55rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .metric-pill.ok {
+      background: rgba(22, 163, 74, 0.1);
+      color: var(--success);
+    }
+
+    .metric-pill.watch {
+      background: rgba(245, 158, 11, 0.1);
+      color: #b45309;
+    }
+
+    .metric-pill.risk {
+      background: rgba(248, 113, 113, 0.1);
+      color: var(--danger);
+    }
+
+    .committee-notes {
+      margin: 0.4rem 0 0.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .committee-table-wrapper {
+      margin-top: 0.6rem;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      overflow: hidden;
+      background: #f9fafb;
+      font-size: 0.8rem;
+    }
+
+    .committee-table-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0.8rem;
+      background: #eef2ff;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      border-radius: var(--radius-pill);
+      padding: 0.16rem 0.55rem;
+      background: rgba(15, 23, 42, 0.05);
+      color: var(--text-muted);
+    }
+
+    .committee-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .committee-table th,
+    .committee-table td {
+      padding: 0.4rem 0.8rem;
+      text-align: left;
+    }
+
+    .committee-table th {
+      font-weight: 500;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.95);
+      background: #f3f4ff;
+    }
+
+    .committee-table tr:nth-child(odd) td {
+      background: #f9fafb;
+    }
+
+    .committee-table tr:nth-child(even) td {
+      background: #fdfdfd;
+    }
+
+    .committee-table td.numeric {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .app-footer {
+      padding: 0.9rem 2.4rem 1.1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    @media (max-width: 980px) {
+      .layout-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .sidebar {
+        position: static;
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 840px) {
+      .cash-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-header,
+      .app-main,
+      .app-footer {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+      }
+
+      .cash-summary-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-header-top">
+        <div>
+          <div class="app-title">
+            Bellingham Cohousing – Finance Dashboard (Q1 2025 Mock)
+          </div>
+          <div class="app-subtitle">
+            Cash &amp; investments vs prior period, plus YTD budget vs actual by committee
+          </div>
+        </div>
+        <div class="header-pill">
+          <span class="dot"></span>
+          Read‑only drilldown · Jan–Mar 2025
+        </div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <!-- 1. Cash & investments summary --------------------------------- -->
+      <section aria-label="Cash and investments summary">
+        <h1 class="section-heading">Cash &amp; investments</h1>
+        <p class="section-subheading">
+          Click any card to drill into the underlying bank and investment accounts. Values compare
+          March&nbsp;31,&nbsp;2025 to the prior period (Feb&nbsp;28,&nbsp;2025).
+        </p>
+
+        <div class="cash-summary-grid">
+          <article class="cash-card active" data-cash-root="bank">
+            <div class="cash-card-label">Bank accounts (cash)</div>
+            <div class="cash-card-main">
+              <div class="cash-card-value" data-cash-current="bank">$190,774</div>
+              <div class="cash-card-chip">▲ $5,436 vs Feb 28</div>
+            </div>
+            <div class="cash-card-footnote">
+              Total checking, savings, CDs and operating cash across WECU and First Federal accounts.
+            </div>
+          </article>
+
+          <article class="cash-card" data-cash-root="investments">
+            <div class="cash-card-label">Investments &amp; CDs</div>
+            <div class="cash-card-main">
+              <div class="cash-card-value" data-cash-current="investments">$370,793</div>
+              <div class="cash-card-chip negative">▼ $3,959 vs Feb 28</div>
+            </div>
+            <div class="cash-card-footnote">
+              Other current assets including CDs at Goldman, JPMorgan, Morgan Stanley, and Vanguard funds.
+            </div>
+          </article>
+
+          <article class="cash-card" data-cash-root="total">
+            <div class="cash-card-label">Total cash + investments</div>
+            <div class="cash-card-main">
+              <div class="cash-card-value" data-cash-current="total">$557,155</div>
+              <div class="cash-card-chip negative">▼ $502 vs Feb 28</div>
+            </div>
+            <div class="cash-card-footnote">
+              Total current assets: bank accounts plus investments and other current assets.
+            </div>
+          </article>
+        </div>
+
+        <div class="drill-card" aria-label="Cash and investments drilldown">
+          <div class="drill-header">
+            <div class="drill-header-main">
+              <h2 id="cash-drill-title">Bank accounts (cash)</h2>
+              <p id="cash-drill-subtitle">
+                Expand the rows to see certificates of deposit and individual bank accounts.
+              </p>
+            </div>
+            <div class="drill-header-tag">
+              <span class="dot"></span>
+              As of March 31, 2025 vs Feb 28, 2025
+            </div>
+          </div>
+
+          <div class="drill-container" id="cash-drill">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. YTD Budget vs Actual by committee --------------------------- -->
+      <section>
+        <h1 class="section-heading" style="margin-top: 1.1rem;">YTD budget vs actual</h1>
+        <p class="section-subheading">
+          Year‑to‑date expenses by committee (Jan–Mar 2025) against the full‑year budget. Choose a committee to
+          see its summary and drill into categories and line items.
+        </p>
+
+        <div class="layout-grid">
+          <!-- Sidebar with committees -->
+          <aside class="sidebar" aria-label="Committees">
+            <div class="sidebar-title">Committees</div>
+            <p class="sidebar-caption">
+              Click a committee to focus the view. Chips show the share of its annual budget used YTD.
+            </p>
+            <ul class="committee-list">
+              <li class="committee-item active" data-committee="board">
+                <span>Board</span>
+                <span class="committee-chip"></span>
+              </li>
+              <li class="committee-item" data-committee="commonHouse">
+                <span>Common House</span>
+                <span class="committee-chip"></span>
+              </li>
+              <li class="committee-item" data-committee="finance">
+                <span>Finance Committee</span>
+                <span class="committee-chip"></span>
+              </li>
+              <li class="committee-item" data-committee="landscape">
+                <span>Landscape</span>
+                <span class="committee-chip"></span>
+              </li>
+              <li class="committee-item" data-committee="maintenance">
+                <span>Maintenance</span>
+                <span class="committee-chip"></span>
+              </li>
+              <li class="committee-item" data-committee="meals">
+                <span>Meals</span>
+                <span class="committee-chip"></span>
+              </li>
+              <li class="committee-item" data-committee="utilities">
+                <span>Utilities</span>
+                <span class="committee-chip"></span>
+              </li>
+            </ul>
+          </aside>
+
+          <!-- Main panel -->
+          <section class="main-panel" aria-label="Committee detail">
+            <header class="panel-header">
+              <div class="panel-header-main">
+                <h2 id="committee-title">Board</h2>
+                <p id="committee-subtitle">
+                  Year‑to‑date spending vs annual budget · January–March 2025
+                </p>
+              </div>
+              <div class="panel-tag">
+                <span class="dot"></span>
+                Updated through March 31, 2025
+              </div>
+            </header>
+
+            <section class="metrics-grid" aria-label="Committee metrics">
+              <article class="metric-card">
+                <div class="metric-label">Budget (annual)</div>
+                <div class="metric-value" id="metric-budget">$0</div>
+                <div class="metric-sub">
+                  Planned spending for the committee for the full fiscal year.
+                </div>
+              </article>
+              <article class="metric-card">
+                <div class="metric-label">Actual (YTD)</div>
+                <div class="metric-value" id="metric-actual">$0</div>
+                <div class="metric-sub">
+                  Expenses booked January–March 2025.
+                </div>
+              </article>
+              <article class="metric-card">
+                <div class="metric-label">Budget remaining</div>
+                <div class="metric-value" id="metric-remaining">$0</div>
+                <div class="metric-sub" id="metric-remaining-note">
+                  Remaining of the annual budget.
+                </div>
+              </article>
+              <article class="metric-card">
+                <div class="metric-label">Budget usage</div>
+                <div class="metric-value" id="metric-percent">0%</div>
+                <div class="metric-sub">
+                  Share of the annual budget used so far.
+                </div>
+                <div class="metric-pill ok" id="metric-status-pill">
+                  On track so far
+                </div>
+              </article>
+            </section>
+
+            <p class="committee-notes" id="committee-notes">
+              Select a committee from the list to view its details.
+            </p>
+
+            <div class="drill-card" style="margin-top: 0.2rem;">
+              <div class="drill-header">
+                <div class="drill-header-main">
+                  <h2>Drilldown by category &amp; line item</h2>
+                  <p>
+                    Expand rows to move from the committee total down into categories and individual budget lines.
+                  </p>
+                </div>
+              </div>
+              <div class="drill-container" id="committee-drill">
+                <!-- populated by JS -->
+              </div>
+            </div>
+
+            <div class="committee-table-wrapper" aria-label="Committee overview table">
+              <div class="committee-table-header">
+                <span>Committee overview</span>
+                <span class="badge">YTD vs annual budget</span>
+              </div>
+              <table class="committee-table">
+                <thead>
+                  <tr>
+                    <th>Committee</th>
+                    <th class="numeric">Budget</th>
+                    <th class="numeric">Actual (YTD)</th>
+                    <th class="numeric">Remaining</th>
+                    <th class="numeric">% used</th>
+                  </tr>
+                </thead>
+                <tbody id="committee-table-body">
+                  <!-- populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      Mock dashboard using BCCA Q1 2025 management report data · For illustration only
+    </footer>
+  </div>
+
+  <script>
+    // ------------------------- Data --------------------------------------
+
+    const cashRoots = {
+      bank: {
+        label: "Bank accounts (cash)",
+        subtitle:
+          "Bank accounts and CDs held at WECU and First Federal. Start with the total, then expand into CDs and individual accounts.",
+        current: 190774,
+        prior: 185338,
+        change: 5436,
+        children: [
+          {
+            label: "Certificates of deposit (WECU)",
+            current: 158866,
+            prior: 157370,
+            change: 1496,
+            children: [
+              {
+                label: "WECU 1‑yr 5.25% 1/18/26",
+                current: 60595,
+                prior: 60121,
+                change: 474
+              },
+              {
+                label: "WECU 2‑yr 4.45% 3/6/27",
+                current: 98271,
+                prior: 97249,
+                change: 1022
+              }
+            ]
+          },
+          {
+            label: "First Federal checking",
+            current: 100,
+            prior: 100,
+            change: 0
+          },
+          {
+            label: "WECU childcare checking",
+            current: 443,
+            prior: 443,
+            change: 0
+          },
+          {
+            label: "WECU debit card",
+            current: 1383,
+            prior: 539,
+            change: 844
+          },
+          {
+            label: "WECU main checking",
+            current: 26651,
+            prior: 23396,
+            change: 3255
+          },
+          {
+            label: "WECU main savings",
+            current: 2674,
+            prior: 2671,
+            change: 3
+          },
+          {
+            label: "WECU meals checking",
+            current: 657,
+            prior: 819,
+            change: -162
+          }
+        ]
+      },
+      investments: {
+        label: "Investments & CDs (other current assets)",
+        subtitle:
+          "Other current assets including CDs at Goldman, JPMorgan, Morgan Stanley, and Vanguard funds.",
+        current: 370793,
+        prior: 374752,
+        change: -3959,
+        children: [
+          {
+            label: "Petty cash",
+            current: 40,
+            prior: 40,
+            change: 0
+          },
+          {
+            label: "Goldman Sachs CD 4.1% 12/31/25",
+            current: 110000,
+            prior: 110000,
+            change: 0
+          },
+          {
+            label: "JPMorgan CD 4.5% 24 mo 1/6/27",
+            current: 62000,
+            prior: 62000,
+            change: 0
+          },
+          {
+            label: "Morgan Stanley CD 5.05% 10/24/25",
+            current: 104000,
+            prior: 104000,
+            change: 0
+          },
+          {
+            label: "Vanguard (total)",
+            current: 370752,
+            prior: 374712,
+            change: -3959,
+            children: [
+              {
+                label: "Unrealized gain / (loss) – Vanguard",
+                current: 23645,
+                prior: 27885,
+                change: -4240
+              },
+              {
+                label: "Vanguard Bond (VCEB)",
+                current: 38792,
+                prior: 38655,
+                change: 137
+              },
+              {
+                label: "Vanguard Index (VFTAX)",
+                current: 31524,
+                prior: 31383,
+                change: 141
+              },
+              {
+                label: "Vanguard Money Market",
+                current: 791,
+                prior: 788,
+                change: 3
+              }
+            ]
+          }
+        ]
+      },
+      total: {
+        label: "Total cash + investments",
+        subtitle:
+          "Total current assets: all bank accounts plus investments and other current assets.",
+        current: 557155,
+        prior: 557657,
+        change: -502,
+        children: [] // will be filled in from bank + investments
+      }
+    };
+
+    // Build children for total root by reusing other roots
+    cashRoots.total.children = [cashRoots.bank, cashRoots.investments];
+
+    const committeeTrees = {
+      board: {
+        key: "board",
+        name: "Board",
+        description:
+          "Board‑level expenses including administration, community building, general meetings, and the tech team.",
+        actual: 773,
+        budget: 10927,
+        remaining: 10154,
+        children: [
+          {
+            label: "Administration",
+            actual: 80,
+            budget: 2850,
+            remaining: 2770,
+            children: [
+              {
+                label: "Cohousing network dues",
+                actual: 80,
+                budget: 250,
+                remaining: 170
+              },
+              {
+                label: "Legal and mediation",
+                actual: 0,
+                budget: 2500,
+                remaining: 2500
+              },
+              {
+                label: "Offsite printing",
+                actual: 0,
+                budget: 50,
+                remaining: 50
+              },
+              {
+                label: "Records management",
+                actual: 0,
+                budget: 50,
+                remaining: 50
+              }
+            ]
+          },
+          {
+            label: "Community building",
+            actual: 0,
+            budget: 1775,
+            remaining: 1775,
+            children: [
+              {
+                label: "Annual campout reservations",
+                actual: 0,
+                budget: 275,
+                remaining: 275
+              },
+              {
+                label: "Retreat / 25th anniversary celebration",
+                actual: 0,
+                budget: 1500,
+                remaining: 1500
+              },
+              {
+                label: "Training – Community Support Team",
+                actual: 0,
+                budget: 0,
+                remaining: 0
+              },
+              {
+                label: "Training – Facilitation Team",
+                actual: 0,
+                budget: 0,
+                remaining: 0
+              }
+            ]
+          },
+          {
+            label: "General meetings",
+            actual: 75,
+            budget: 1260,
+            remaining: 1185,
+            children: [
+              {
+                label: "Child care",
+                actual: 75,
+                budget: 900,
+                remaining: 825
+              },
+              {
+                label: "GM snacks",
+                actual: 0,
+                budget: 300,
+                remaining: 300
+              },
+              {
+                label: "GM supplies",
+                actual: 0,
+                budget: 60,
+                remaining: 60
+              }
+            ]
+          },
+          {
+            label: "Tech team",
+            actual: 617,
+            budget: 5042,
+            remaining: 4425,
+            children: [
+              {
+                label: "Gather and Squarespace",
+                actual: 209,
+                budget: 1352,
+                remaining: 1143
+              },
+              {
+                label: "Internet access & e‑mail",
+                actual: 373,
+                budget: 3230,
+                remaining: 2857
+              },
+              {
+                label: "Website hosting & domain",
+                actual: 0,
+                budget: 250,
+                remaining: 250
+              },
+              {
+                label: "Zoom",
+                actual: 35,
+                budget: 210,
+                remaining: 175
+              }
+            ]
+          }
+        ]
+      },
+
+      commonHouse: {
+        key: "commonHouse",
+        name: "Common House",
+        description:
+          "Common House cleaning, supplies, events, repairs, and durable items such as furnishings and equipment.",
+        actual: 674,
+        budget: 7050,
+        remaining: 6376,
+        children: [
+          {
+            label: "AV; piano tuning / entertainment",
+            actual: 0,
+            budget: 250,
+            remaining: 250
+          },
+          {
+            label: "CH office supplies",
+            actual: 40,
+            budget: 500,
+            remaining: 460
+          },
+          {
+            label: "Cleaning",
+            actual: 765,
+            budget: 4425,
+            remaining: 3660
+          },
+          {
+            label: "Donations – CH use (offset to income)",
+            actual: -460,
+            budget: -1300,
+            remaining: -840
+          },
+          {
+            label: "Durables budget",
+            actual: 25,
+            budget: 775,
+            remaining: 750,
+            children: [
+              {
+                label: "Furnishings",
+                actual: 0,
+                budget: 500,
+                remaining: 500
+              },
+              {
+                label: "Kitchen equipment",
+                actual: 25,
+                budget: 100,
+                remaining: 75
+              },
+              {
+                label: "Paint and painting",
+                actual: 0,
+                budget: 50,
+                remaining: 50
+              },
+              {
+                label: "Playroom (furniture / projects)",
+                actual: 0,
+                budget: 75,
+                remaining: 75
+              },
+              {
+                label: "TAC room",
+                actual: 0,
+                budget: 50,
+                remaining: 50
+              }
+            ]
+          },
+          {
+            label: "Events",
+            actual: 34,
+            budget: 150,
+            remaining: 116
+          },
+          {
+            label: "Lead paint remediation",
+            actual: 6,
+            budget: 150,
+            remaining: 144
+          },
+          {
+            label: "Miscellaneous & unintended",
+            actual: 0,
+            budget: 200,
+            remaining: 200
+          },
+          {
+            label: "Non‑meal supplies",
+            actual: 254,
+            budget: 800,
+            remaining: 546
+          },
+          {
+            label: "Repairs",
+            actual: 0,
+            budget: 1000,
+            remaining: 1000
+          },
+          {
+            label: "Work party lunches",
+            actual: 9,
+            budget: 100,
+            remaining: 91
+          }
+        ]
+      },
+
+      finance: {
+        key: "finance",
+        name: "Finance Committee",
+        description:
+          "Accounting, insurance, audit / independent review, QuickBooks, and other finance‑related costs.",
+        actual: 22143,
+        budget: 37010,
+        remaining: 14867,
+        children: [
+          {
+            label: "Accounting",
+            actual: 0,
+            budget: 225,
+            remaining: 225
+          },
+          {
+            label: "Audit / independent review",
+            actual: 0,
+            budget: 2475,
+            remaining: 2475
+          },
+          {
+            label: "Federal income tax expense",
+            actual: 0,
+            budget: 0,
+            remaining: 0
+          },
+          {
+            label: "Insurance",
+            actual: 21486,
+            budget: 33600,
+            remaining: 12114
+          },
+          {
+            label: "Miscellaneous",
+            actual: 20,
+            budget: 110,
+            remaining: 90
+          },
+          {
+            label: "QuickBooks",
+            actual: 637,
+            budget: 600,
+            remaining: -37
+          },
+          {
+            label: "Reserves study",
+            actual: 0,
+            budget: 0,
+            remaining: 0
+          }
+        ]
+      },
+
+      landscape: {
+        key: "landscape",
+        name: "Landscape",
+        description:
+          "Garden and landscape materials, tools, professional services, and work‑party lunches.",
+        actual: 600,
+        budget: 3150,
+        remaining: 2551,
+        children: [
+          {
+            label: "Comptown team",
+            actual: 0,
+            budget: 50,
+            remaining: 50
+          },
+          {
+            label: "Equipment rental",
+            actual: 0,
+            budget: 200,
+            remaining: 200
+          },
+          {
+            label: "Fertilizers, soil, mulches",
+            actual: 0,
+            budget: 350,
+            remaining: 350
+          },
+          {
+            label: "Fuel and oil",
+            actual: 0,
+            budget: 10,
+            remaining: 10
+          },
+          {
+            label: "Garden",
+            actual: 0,
+            budget: 200,
+            remaining: 200
+          },
+          {
+            label: "Landscape rocks",
+            actual: 0,
+            budget: 150,
+            remaining: 150
+          },
+          {
+            label: "Path upgrade edge treatment",
+            actual: 0,
+            budget: 150,
+            remaining: 150
+          },
+          {
+            label: "Plants, starts, and seeds",
+            actual: 0,
+            budget: 300,
+            remaining: 300
+          },
+          {
+            label: "Professional services – tree trim",
+            actual: 600,
+            budget: 1000,
+            remaining: 401
+          },
+          {
+            label: "Tools & tool maintenance",
+            actual: 0,
+            budget: 500,
+            remaining: 500
+          },
+          {
+            label: "Waste corral team",
+            actual: 0,
+            budget: 40,
+            remaining: 40
+          },
+          {
+            label: "Work party lunches",
+            actual: 0,
+            budget: 200,
+            remaining: 200
+          }
+        ]
+      },
+
+      maintenance: {
+        key: "maintenance",
+        name: "Maintenance",
+        description:
+          "Building exterior and interior work, grounds, and unpredictable repairs and utility work.",
+        actual: 7105,
+        budget: 18935,
+        remaining: 11830,
+        children: [
+          {
+            label: "Building exterior",
+            actual: 654,
+            budget: 6700,
+            remaining: 6046,
+            children: [
+              {
+                label: "Building work party",
+                actual: 0,
+                budget: 300,
+                remaining: 300
+              },
+              {
+                label: "Exterior unpredictable",
+                actual: 0,
+                budget: 2000,
+                remaining: 2000
+              },
+              {
+                label: "Materials for painting, etc.",
+                actual: 0,
+                budget: 600,
+                remaining: 600
+              },
+              {
+                label: "Upper A stair treads",
+                actual: 0,
+                budget: 1500,
+                remaining: 1500
+              },
+              {
+                label: "Upper gutter cleaning",
+                actual: 654,
+                budget: 1600,
+                remaining: 946
+              },
+              {
+                label: "Workshop expenses",
+                actual: 0,
+                budget: 700,
+                remaining: 700
+              }
+            ]
+          },
+          {
+            label: "Building interior",
+            actual: 932,
+            budget: 6525,
+            remaining: 5593,
+            children: [
+              {
+                label: "Dryer vents",
+                actual: 0,
+                budget: 375,
+                remaining: 375
+              },
+              {
+                label: "Interior unpredictable",
+                actual: 0,
+                budget: 2000,
+                remaining: 2000
+              },
+              {
+                label: "Repairs to heat & water systems",
+                actual: 0,
+                budget: 3000,
+                remaining: 3000
+              },
+              {
+                label: "Smoke alarm check / batteries",
+                actual: 0,
+                budget: 0,
+                remaining: 0
+              },
+              {
+                label: "Sprinklers, fire extinguishers, backflow",
+                actual: 932,
+                budget: 1150,
+                remaining: 218
+              },
+              {
+                label: "Sump pump inspection / repair",
+                actual: 0,
+                budget: 0,
+                remaining: 0
+              }
+            ]
+          },
+          {
+            label: "Grounds",
+            actual: 5520,
+            budget: 5710,
+            remaining: 190,
+            children: [
+              {
+                label: "Grounds unpredictable",
+                actual: 205,
+                budget: 2000,
+                remaining: 1795
+              },
+              {
+                label: "Lighting and electricity",
+                actual: 109,
+                budget: 500,
+                remaining: 391
+              },
+              {
+                label: "Pest control",
+                actual: 87,
+                budget: 2860,
+                remaining: 2773
+              },
+              {
+                label: "Pressure washer",
+                actual: 0,
+                budget: 350,
+                remaining: 350
+              },
+              {
+                label: "Utility repairs",
+                actual: 5119,
+                budget: 0,
+                remaining: -5119
+              }
+            ]
+          }
+        ]
+      },
+
+      meals: {
+        key: "meals",
+        name: "Meals",
+        description:
+          "Community meals, celebrations, pantry supplies, and coffee – net of billings back to members.",
+        actual: 57,
+        budget: 950,
+        remaining: 893,
+        children: [
+          {
+            label: "Celebrations",
+            actual: 82,
+            budget: 600,
+            remaining: 518,
+            children: [
+              {
+                label: "Community celebrations",
+                actual: 82,
+                budget: 600,
+                remaining: 518
+              }
+            ]
+          },
+          {
+            label: "Meal team meals",
+            actual: 48,
+            budget: 350,
+            remaining: 302,
+            children: [
+              {
+                label: "Groceries",
+                actual: 938,
+                budget: 0,
+                remaining: -938
+              },
+              {
+                label: "Meals billed to members",
+                actual: -955,
+                budget: 0,
+                remaining: 955
+              },
+              {
+                label: "Pantry",
+                actual: 64,
+                budget: 350,
+                remaining: 286
+              }
+            ]
+          },
+          {
+            label: "Morning coffee",
+            actual: -115,
+            budget: 0,
+            remaining: 115,
+            children: [
+              {
+                label: "Coffee billed to members",
+                actual: -231,
+                budget: 0,
+                remaining: 231
+              },
+              {
+                label: "Coffee purchases",
+                actual: 116,
+                budget: 0,
+                remaining: -116
+              }
+            ]
+          }
+        ]
+      },
+
+      utilities: {
+        key: "utilities",
+        name: "Utilities",
+        description:
+          "Electricity, natural gas, trash and recycling, and water and sewer for the community.",
+        actual: 17465,
+        budget: 77850,
+        remaining: 60385,
+        children: [
+          {
+            label: "Electricity",
+            actual: 4117,
+            budget: 20200,
+            remaining: 16083
+          },
+          {
+            label: "Natural gas",
+            actual: 8463,
+            budget: 24300,
+            remaining: 15837
+          },
+          {
+            label: "Trash & recycling",
+            actual: 1030,
+            budget: 7450,
+            remaining: 6420
+          },
+          {
+            label: "Water and sewer",
+            actual: 3856,
+            budget: 25900,
+            remaining: 22044
+          }
+        ]
+      }
+    };
+
+    const committeeColumns = [
+      { key: "actual", label: "Actual (YTD)" },
+      { key: "budget", label: "Budget (annual)" },
+      { key: "remaining", label: "Remaining" }
+    ];
+
+    const cashColumns = [
+      { key: "current", label: "Mar 31, 2025" },
+      { key: "prior", label: "Feb 28, 2025" },
+      { key: "change", label: "Change" }
+    ];
+
+    // ------------------------- Helpers -----------------------------------
+
+    const currencyFormatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0
+    });
+
+    function formatCurrency(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return value;
+      return currencyFormatter.format(num);
+    }
+
+    function classifyBudgetStatus(pct) {
+      if (pct >= 80) return { className: "risk", label: "High – close to over budget" };
+      if (pct >= 60) return { className: "watch", label: "Worth keeping an eye on" };
+      return { className: "ok", label: "Comfortably under budget so far" };
+    }
+
+    // Generic tree renderer: works for both cash and committee drilldowns
+    function renderTree(container, rootNode, columns, options = {}) {
+      if (!container || !rootNode) return;
+      container.innerHTML = "";
+
+      const headerRow = document.createElement("div");
+      headerRow.className = "drill-header-row";
+
+      const firstCol = document.createElement("div");
+      firstCol.className = "drill-col-label";
+      firstCol.textContent = options.firstColumnLabel || "Line";
+      firstCol.style.textAlign = "left";
+      headerRow.appendChild(firstCol);
+
+      columns.forEach((col) => {
+        const colLabel = document.createElement("div");
+        colLabel.className = "drill-col-label";
+        colLabel.textContent = col.label;
+        headerRow.appendChild(colLabel);
+      });
+
+      container.appendChild(headerRow);
+
+      const body = document.createElement("div");
+      body.className = "drill-body";
+      container.appendChild(body);
+
+      function addNode(node, level, parentEl) {
+        const row = document.createElement("div");
+        row.className = "drill-row";
+        const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+        row.dataset.level = String(level);
+
+        const main = document.createElement("div");
+        main.className = "drill-main";
+
+        let toggle;
+        if (hasChildren) {
+          toggle = document.createElement("button");
+          toggle.type = "button";
+          toggle.className = "drill-toggle";
+          toggle.style.marginLeft = `${level * 1.1}rem`;
+        } else {
+          toggle = document.createElement("span");
+          toggle.className = "drill-toggle is-leaf";
+          toggle.style.marginLeft = `${level * 1.1}rem`;
+        }
+
+        const label = document.createElement("span");
+        label.className = "drill-label";
+        label.textContent = node.label;
+
+        main.appendChild(toggle);
+        main.appendChild(label);
+        row.appendChild(main);
+
+        columns.forEach((col) => {
+          const val = node[col.key];
+          const cell = document.createElement("div");
+          cell.className = "drill-cell";
+
+          let formatted = "";
+          if (col.key === "change") {
+            const num = Number(val);
+            formatted = formatCurrency(num);
+            if (Number.isFinite(num)) {
+              if (num > 0) cell.classList.add("drill-cell-change-positive");
+              if (num < 0) cell.classList.add("drill-cell-change-negative");
+            }
+          } else {
+            formatted = formatCurrency(val);
+          }
+
+          cell.textContent = formatted;
+          row.appendChild(cell);
+        });
+
+        parentEl.appendChild(row);
+
+        let childrenWrap = null;
+        if (hasChildren) {
+          childrenWrap = document.createElement("div");
+          childrenWrap.className = "drill-children";
+          parentEl.appendChild(childrenWrap);
+
+          const initiallyOpen = level === 0;
+          if (initiallyOpen) {
+            row.classList.add("open");
+            childrenWrap.style.display = "block";
+          }
+
+          toggle.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const isOpen = row.classList.toggle("open");
+            childrenWrap.style.display = isOpen ? "block" : "none";
+          });
+        }
+
+        if (hasChildren) {
+          node.children.forEach((child) => addNode(child, level + 1, childrenWrap));
+        }
+      }
+
+      addNode(rootNode, 0, body);
+    }
+
+    // ------------------------- Cash drilldown -----------------------------
+
+    function selectCashRoot(key) {
+      const root = cashRoots[key];
+      if (!root) return;
+
+      const title = document.getElementById("cash-drill-title");
+      const subtitle = document.getElementById("cash-drill-subtitle");
+      if (title) title.textContent = root.label;
+      if (subtitle) subtitle.textContent = root.subtitle;
+
+      const drill = document.getElementById("cash-drill");
+      renderTree(drill, root, cashColumns, { firstColumnLabel: "Account" });
+
+      const cards = document.querySelectorAll(".cash-card");
+      cards.forEach((card) => {
+        const isActive = card.dataset.cashRoot === key;
+        card.classList.toggle("active", isActive);
+      });
+    }
+
+    function initCashCards() {
+      const cards = document.querySelectorAll(".cash-card");
+      cards.forEach((card) => {
+        card.addEventListener("click", () => {
+          const key = card.dataset.cashRoot;
+          selectCashRoot(key);
+        });
+      });
+
+      // default selection
+      selectCashRoot("bank");
+    }
+
+    // ------------------------- Committees ---------------------------------
+
+    function selectCommittee(key) {
+      const data = committeeTrees[key];
+      if (!data) return;
+
+      const title = document.getElementById("committee-title");
+      const subtitle = document.getElementById("committee-subtitle");
+      const notes = document.getElementById("committee-notes");
+      const budgetEl = document.getElementById("metric-budget");
+      const actualEl = document.getElementById("metric-actual");
+      const remainingEl = document.getElementById("metric-remaining");
+      const remainingNote = document.getElementById("metric-remaining-note");
+      const percentEl = document.getElementById("metric-percent");
+      const statusPill = document.getElementById("metric-status-pill");
+
+      if (title) title.textContent = data.name;
+      if (subtitle) {
+        subtitle.textContent =
+          "Year‑to‑date spending vs annual budget · January–March 2025";
+      }
+      if (notes) notes.textContent = data.description;
+
+      const budget = data.budget || 0;
+      const actual = data.actual || 0;
+      const remaining = data.remaining ?? budget - actual;
+      const pct = budget > 0 ? (actual / budget) * 100 : 0;
+
+      if (budgetEl) budgetEl.textContent = formatCurrency(budget);
+      if (actualEl) actualEl.textContent = formatCurrency(actual);
+      if (remainingEl) remainingEl.textContent = formatCurrency(remaining);
+      if (remainingNote) {
+        remainingNote.textContent =
+          remaining >= 0
+            ? "Remaining of the annual budget."
+            : "Over budget by this amount.";
+      }
+      if (percentEl) {
+        const pctText = pct.toFixed(1).replace(/\.0$/, "");
+        percentEl.textContent = `${pctText}%`;
+      }
+
+      if (statusPill) {
+        const { className, label } = classifyBudgetStatus(pct);
+        statusPill.className = `metric-pill ${className}`;
+        statusPill.textContent = label;
+      }
+
+      const drill = document.getElementById("committee-drill");
+      const rootNode = {
+        label: `${data.name} (total)`,
+        actual: data.actual,
+        budget: data.budget,
+        remaining: data.remaining,
+        children: data.children || []
+      };
+      renderTree(drill, rootNode, committeeColumns, {
+        firstColumnLabel: "Category / line item"
+      });
+
+      const items = document.querySelectorAll(".committee-item");
+      items.forEach((item) => {
+        item.classList.toggle("active", item.dataset.committee === key);
+      });
+    }
+
+    function initCommitteeSidebar() {
+      const items = document.querySelectorAll(".committee-item");
+      items.forEach((item) => {
+        const key = item.dataset.committee;
+        const data = committeeTrees[key];
+        const chip = item.querySelector(".committee-chip");
+        if (data && chip) {
+          const budget = data.budget || 0;
+          const actual = data.actual || 0;
+          const pct = budget > 0 ? (actual / budget) * 100 : 0;
+          chip.textContent = `${pct.toFixed(0)}% used`;
+        }
+
+        item.addEventListener("click", () => {
+          selectCommittee(key);
+        });
+      });
+
+      // default
+      selectCommittee("board");
+    }
+
+    function renderCommitteeTable() {
+      const tbody = document.getElementById("committee-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      Object.values(committeeTrees).forEach((data) => {
+        const tr = document.createElement("tr");
+        const budget = data.budget || 0;
+        const actual = data.actual || 0;
+        const remaining = data.remaining ?? budget - actual;
+        const pct = budget > 0 ? (actual / budget) * 100 : 0;
+
+        tr.innerHTML = `
+          <td>${data.name}</td>
+          <td class="numeric">${formatCurrency(budget)}</td>
+          <td class="numeric">${formatCurrency(actual)}</td>
+          <td class="numeric">${formatCurrency(remaining)}</td>
+          <td class="numeric">${pct.toFixed(1).replace(/\\.0$/, "")}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ------------------------- Init --------------------------------------
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initCashCards();
+      initCommitteeSidebar();
+      renderCommitteeTable();
+    });
+  </script>
+</body>
+</html>
