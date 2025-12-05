@@ -7,3 +7,4 @@ course-git-blog-project
 
 # macOS system files
 .DS_Store
+cli/venv/
