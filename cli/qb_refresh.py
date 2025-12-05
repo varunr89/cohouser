@@ -195,7 +195,7 @@ def fetch_all_paginated(config: dict, base_query: str, entity_type: str) -> list
 
 
 def fetch_transactions(config: dict, start_date: str, end_date: str) -> dict:
-    """Fetch transactions (purchases and bills) from QuickBooks."""
+    """Fetch transactions (purchases, bills, and journal entries) from QuickBooks."""
     print("Fetching transactions...")
 
     # Fetch all purchases with pagination
@@ -214,9 +214,18 @@ def fetch_transactions(config: dict, start_date: str, end_date: str) -> dict:
     )
     print(f"  Fetched {len(bills)} bills")
 
+    # Fetch all journal entries with pagination (for accruals, prepaid expenses, etc.)
+    journal_entries = fetch_all_paginated(
+        config,
+        f"SELECT * FROM JournalEntry WHERE TxnDate >= '{start_date}' AND TxnDate <= '{end_date}'",
+        "JournalEntry"
+    )
+    print(f"  Fetched {len(journal_entries)} journal entries")
+
     return {
         "purchases": {"QueryResponse": {"Purchase": purchases}},
-        "bills": {"QueryResponse": {"Bill": bills}}
+        "bills": {"QueryResponse": {"Bill": bills}},
+        "journal_entries": {"QueryResponse": {"JournalEntry": journal_entries}}
     }
 
 
@@ -895,6 +904,10 @@ def transform_transactions(raw_data: dict, account_mapping: dict = None) -> dict
         # Last resort: return the name as-is (won't match committee)
         return acct_name
 
+    def is_expense_account(account_path: str) -> bool:
+        """Check if account path is an expense account we want to include."""
+        return account_path.startswith("Expenses:") or account_path.startswith("Utilities")
+
     # Process purchases (checks, credit card charges, etc.)
     purchases = raw_data.get("purchases", {}).get("QueryResponse", {}).get("Purchase", [])
 
@@ -913,11 +926,7 @@ def transform_transactions(raw_data: dict, account_mapping: dict = None) -> dict
             # Resolve to full path using the account mapping
             account_path = resolve_account_path(account_ref)
 
-            if not account_path:
-                continue
-
-            # Skip non-expense accounts (like Reserve Expenses)
-            if not account_path.startswith("Expenses:") and not account_path.startswith("Utilities"):
+            if not account_path or not is_expense_account(account_path):
                 continue
 
             amount = line.get("Amount", 0)
@@ -931,6 +940,45 @@ def transform_transactions(raw_data: dict, account_mapping: dict = None) -> dict
                 "committee": get_committee(account_path),
                 "amount": amount,
                 "memo": memo,
+                "type": "Purchase",
+            })
+
+    # Process journal entries (for accruals, prepaid expenses, adjustments)
+    journal_entries = raw_data.get("journal_entries", {}).get("QueryResponse", {}).get("JournalEntry", [])
+
+    for entry in journal_entries:
+        date = entry.get("TxnDate", "")
+        doc_number = entry.get("DocNumber", "")
+
+        for line in entry.get("Line", []):
+            detail = line.get("JournalEntryLineDetail", {})
+            account_ref = detail.get("AccountRef", {})
+            posting_type = detail.get("PostingType", "")
+
+            # Only include debit entries to expense accounts (debits increase expenses)
+            if posting_type != "Debit":
+                continue
+
+            if not account_ref:
+                continue
+
+            account_path = resolve_account_path(account_ref)
+
+            if not account_path or not is_expense_account(account_path):
+                continue
+
+            amount = line.get("Amount", 0)
+            description = line.get("Description", "") or ""
+
+            transactions.append({
+                "date": date,
+                "vendor": f"Journal Entry {doc_number}" if doc_number else "Journal Entry",
+                "account": get_line_item(account_path),
+                "accountPath": account_path,
+                "committee": get_committee(account_path),
+                "amount": amount,
+                "memo": description,
+                "type": "JournalEntry",
             })
 
     # Sort by date descending (newest first)
