@@ -781,6 +781,32 @@
           see its summary and drill into categories and line items.
         </p>
 
+        <!-- Committee Overview Table -->
+        <div class="drill-card" style="margin-bottom: 1.5rem;">
+          <div class="drill-header">
+            <div class="drill-header-main">
+              <h2>Committee overview</h2>
+              <p>All committees at a glance — YTD spending vs annual budget.</p>
+            </div>
+          </div>
+          <div style="padding: 0 1rem 1rem;">
+            <table class="committee-table">
+              <thead>
+                <tr>
+                  <th>Committee</th>
+                  <th class="numeric">Actual (YTD)</th>
+                  <th class="numeric">Budget</th>
+                  <th class="numeric">Remaining</th>
+                  <th class="numeric">% used</th>
+                </tr>
+              </thead>
+              <tbody id="committee-table-body">
+                <!-- populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <div class="layout-grid">
           <!-- Sidebar with committees -->
           <aside class="sidebar" aria-label="Committees">
@@ -887,26 +913,6 @@
               </div>
             </div>
 
-            <div class="committee-table-wrapper" aria-label="Committee overview table">
-              <div class="committee-table-header">
-                <span>Committee overview</span>
-                <span class="badge">YTD vs annual budget</span>
-              </div>
-              <table class="committee-table">
-                <thead>
-                  <tr>
-                    <th>Committee</th>
-                    <th class="numeric">Actual (YTD)</th>
-                    <th class="numeric">Budget</th>
-                    <th class="numeric">Remaining</th>
-                    <th class="numeric">% used</th>
-                  </tr>
-                </thead>
-                <tbody id="committee-table-body">
-                  <!-- populated by JS -->
-                </tbody>
-              </table>
-            </div>
           </section>
         </div>
       </section>
