@@ -136,15 +136,38 @@ def qb_api_request(config: dict, endpoint: str, params: dict = None) -> dict:
 
 
 def fetch_balance_sheet(config: dict) -> dict:
-    """Fetch Balance Sheet report from QuickBooks."""
-    print("Fetching Balance Sheet...")
+    """Fetch Balance Sheet report from QuickBooks (current period)."""
+    print("Fetching Balance Sheet (current)...")
     return qb_api_request(config, "reports/BalanceSheet")
+
+
+def fetch_balance_sheet_prior(config: dict, as_of_date: str) -> dict:
+    """Fetch Balance Sheet report for a specific prior date (start of year)."""
+    print(f"Fetching Balance Sheet (as of {as_of_date})...")
+    return qb_api_request(config, "reports/BalanceSheet", params={
+        "date_macro": "",  # Clear the macro to use explicit date
+        "start_date": as_of_date,
+        "end_date": as_of_date
+    })
 
 
 def fetch_profit_and_loss(config: dict) -> dict:
     """Fetch Profit and Loss report from QuickBooks."""
     print("Fetching Profit and Loss...")
     return qb_api_request(config, "reports/ProfitAndLoss")
+
+
+def fetch_budgets(config: dict) -> dict:
+    """Fetch all Budget entities from QuickBooks."""
+    print("Fetching Budgets...")
+    try:
+        result = qb_api_request(config, "query", params={
+            "query": "SELECT * FROM Budget"
+        })
+        return result
+    except Exception as e:
+        print(f"Warning: Could not fetch budgets: {e}")
+        return {"QueryResponse": {}}
 
 
 def fetch_transactions(config: dict, start_date: str, end_date: str) -> dict:
@@ -211,8 +234,43 @@ def find_section_by_header(rows: list, header_contains: str) -> Optional[dict]:
     return None
 
 
-def extract_accounts_from_section(section: dict) -> list:
-    """Extract account data from a QB section."""
+def extract_accounts_flat(section: dict, prefix: str = "") -> dict:
+    """
+    Extract accounts from a section as a flat dict: {account_name: balance}.
+    Used for prior period lookup.
+    """
+    accounts = {}
+    rows = section.get("Rows", {}).get("Row", [])
+
+    for row in rows:
+        if row.get("type") == "Data":
+            col_data = row.get("ColData", [])
+            if len(col_data) >= 2:
+                name = col_data[0].get("value", "")
+                balance = parse_value(col_data[1].get("value", "0"))
+                if name:
+                    full_name = f"{prefix}:{name}" if prefix else name
+                    accounts[name] = balance  # Use short name for lookup
+        elif row.get("type") == "Section":
+            header = row.get("Header", {}).get("ColData", [{}])[0].get("value", "")
+            summary = row.get("Summary", {}).get("ColData", [])
+            total = parse_value(summary[1].get("value", "0")) if len(summary) >= 2 else 0
+
+            if header:
+                accounts[header] = total
+                # Recurse into children
+                child_prefix = f"{prefix}:{header}" if prefix else header
+                child_accounts = extract_accounts_flat(row, child_prefix)
+                accounts.update(child_accounts)
+
+    return accounts
+
+
+def extract_accounts_from_section(section: dict, prior_lookup: dict = None) -> list:
+    """Extract account data from a QB section with optional prior period data."""
+    if prior_lookup is None:
+        prior_lookup = {}
+
     accounts = []
     rows = section.get("Rows", {}).get("Row", [])
 
@@ -223,11 +281,12 @@ def extract_accounts_from_section(section: dict) -> list:
                 name = col_data[0].get("value", "")
                 balance = parse_value(col_data[1].get("value", "0"))
                 if name and balance != 0:
+                    prior = prior_lookup.get(name, 0)
                     accounts.append({
                         "label": name,
                         "current": balance,
-                        "prior": 0,  # Would need prior period data
-                        "change": 0
+                        "prior": prior,
+                        "change": round(balance - prior, 2)
                     })
         elif row.get("type") == "Section":
             # Nested section - extract recursively
@@ -235,14 +294,15 @@ def extract_accounts_from_section(section: dict) -> list:
             summary = row.get("Summary", {}).get("ColData", [])
             total = parse_value(summary[1].get("value", "0")) if len(summary) >= 2 else 0
 
-            children = extract_accounts_from_section(row)
+            children = extract_accounts_from_section(row, prior_lookup)
+            prior = prior_lookup.get(header, 0)
 
             if header and (total != 0 or children):
                 accounts.append({
                     "label": header,
                     "current": total,
-                    "prior": 0,
-                    "change": 0,
+                    "prior": prior,
+                    "change": round(total - prior, 2),
                     "children": children if children else None
                 })
 
@@ -254,7 +314,30 @@ def extract_accounts_from_section(section: dict) -> list:
     return accounts
 
 
-def transform_balance_sheet(qb_data: dict) -> dict:
+def extract_section_totals(qb_data: dict) -> dict:
+    """Extract bank and investment totals from a balance sheet."""
+    rows = qb_data.get("Rows", {}).get("Row", [])
+
+    bank_section = find_section_by_group(rows, "BankAccounts")
+    bank_total = 0
+    if bank_section:
+        summary = bank_section.get("Summary", {}).get("ColData", [])
+        bank_total = parse_value(summary[1].get("value", "0")) if len(summary) >= 2 else 0
+
+    other_current_section = find_section_by_group(rows, "OtherCurrentAssets")
+    investment_total = 0
+    if other_current_section:
+        summary = other_current_section.get("Summary", {}).get("ColData", [])
+        investment_total = parse_value(summary[1].get("value", "0")) if len(summary) >= 2 else 0
+
+    return {
+        "bank": bank_total,
+        "investments": investment_total,
+        "total": bank_total + investment_total
+    }
+
+
+def transform_balance_sheet(qb_data: dict, prior_data: dict = None) -> dict:
     """
     Transform QB Balance Sheet to dashboard format.
 
@@ -271,8 +354,33 @@ def transform_balance_sheet(qb_data: dict) -> dict:
         "investments": {...},
         "total": {...}
     }
+
+    Args:
+        qb_data: Current period balance sheet from QB API
+        prior_data: Optional prior period balance sheet (e.g., start of year)
     """
     rows = qb_data.get("Rows", {}).get("Row", [])
+
+    # Extract prior period account-level data if available
+    prior_totals = {"bank": 0, "investments": 0, "total": 0}
+    prior_bank_lookup = {}
+    prior_investment_lookup = {}
+    prior_date = None
+
+    if prior_data:
+        prior_rows = prior_data.get("Rows", {}).get("Row", [])
+        prior_totals = extract_section_totals(prior_data)
+        prior_date = prior_data.get("Header", {}).get("EndPeriod", "")
+
+        # Extract account-level prior values for bank accounts
+        prior_bank_section = find_section_by_group(prior_rows, "BankAccounts")
+        if prior_bank_section:
+            prior_bank_lookup = extract_accounts_flat(prior_bank_section)
+
+        # Extract account-level prior values for investments
+        prior_investment_section = find_section_by_group(prior_rows, "OtherCurrentAssets")
+        if prior_investment_section:
+            prior_investment_lookup = extract_accounts_flat(prior_investment_section)
 
     # Find Bank Accounts section
     bank_section = find_section_by_group(rows, "BankAccounts")
@@ -280,7 +388,7 @@ def transform_balance_sheet(qb_data: dict) -> dict:
     bank_total = 0
 
     if bank_section:
-        bank_accounts = extract_accounts_from_section(bank_section)
+        bank_accounts = extract_accounts_from_section(bank_section, prior_bank_lookup)
         summary = bank_section.get("Summary", {}).get("ColData", [])
         bank_total = parse_value(summary[1].get("value", "0")) if len(summary) >= 2 else 0
 
@@ -290,7 +398,7 @@ def transform_balance_sheet(qb_data: dict) -> dict:
     investment_total = 0
 
     if other_current_section:
-        investment_accounts = extract_accounts_from_section(other_current_section)
+        investment_accounts = extract_accounts_from_section(other_current_section, prior_investment_lookup)
         summary = other_current_section.get("Summary", {}).get("ColData", [])
         investment_total = parse_value(summary[1].get("value", "0")) if len(summary) >= 2 else 0
 
@@ -309,28 +417,29 @@ def transform_balance_sheet(qb_data: dict) -> dict:
             "label": "Bank accounts (cash)",
             "subtitle": "Bank accounts and CDs held at WECU and First Federal.",
             "current": bank_total,
-            "prior": 0,  # Would need prior period
-            "change": 0,
+            "prior": prior_totals["bank"],
+            "change": round(bank_total - prior_totals["bank"], 2),
             "children": bank_accounts
         },
         "investments": {
             "label": "Investments & CDs (other current assets)",
             "subtitle": "Other current assets including CDs and Vanguard funds.",
             "current": investment_total,
-            "prior": 0,
-            "change": 0,
+            "prior": prior_totals["investments"],
+            "change": round(investment_total - prior_totals["investments"], 2),
             "children": investment_accounts
         },
         "total": {
             "label": "Total cash + investments",
             "subtitle": "Total current assets: bank accounts plus investments.",
             "current": current_assets_total,
-            "prior": 0,
-            "change": 0,
-            "children": []  # Will reference bank and investments
+            "prior": prior_totals["total"],
+            "change": round(current_assets_total - prior_totals["total"], 2),
+            "children": []
         },
         "metadata": {
             "report_date": qb_data.get("Header", {}).get("EndPeriod", ""),
+            "prior_date": prior_date,
             "total_assets": total_assets
         }
     }
@@ -340,8 +449,18 @@ def transform_balance_sheet(qb_data: dict) -> dict:
 # Profit & Loss Transformation
 # ============================================================================
 
-def extract_expense_tree(section: dict) -> list:
-    """Extract expense categories from a P&L section."""
+def extract_expense_tree(section: dict, budgets: dict = None, path_prefix: str = "") -> list:
+    """
+    Extract expense categories from a P&L section with budget matching.
+
+    Args:
+        section: QB P&L section data
+        budgets: Dict of {full_account_path: amount} for budget lookup
+        path_prefix: Current path in the expense hierarchy (e.g., "Expenses:Board")
+    """
+    if budgets is None:
+        budgets = {}
+
     items = []
     rows = section.get("Rows", {}).get("Row", [])
 
@@ -352,25 +471,38 @@ def extract_expense_tree(section: dict) -> list:
                 name = col_data[0].get("value", "")
                 actual = abs(parse_value(col_data[1].get("value", "0")))
                 if name:
+                    # Build full path for budget lookup
+                    full_path = f"{path_prefix}:{name}" if path_prefix else name
+                    budget = budgets.get(full_path, 0)
                     items.append({
                         "label": name,
                         "actual": actual,
-                        "budget": 0,  # Budget from separate source
-                        "remaining": 0
+                        "budget": budget,
+                        "remaining": max(0, budget - actual) if budget > 0 else 0
                     })
         elif row.get("type") == "Section":
             header = row.get("Header", {}).get("ColData", [{}])[0].get("value", "")
             summary = row.get("Summary", {}).get("ColData", [])
             total = abs(parse_value(summary[1].get("value", "0"))) if len(summary) >= 2 else 0
 
-            children = extract_expense_tree(row)
+            # Build path for children
+            child_path = f"{path_prefix}:{header}" if path_prefix else header
+            children = extract_expense_tree(row, budgets, child_path)
+
+            # Get budget for this section (sum of children or direct match)
+            full_path = f"{path_prefix}:{header}" if path_prefix else header
+            budget = budgets.get(full_path, 0)
+
+            # If no direct budget, sum children budgets
+            if budget == 0 and children:
+                budget = sum(c.get("budget", 0) for c in children)
 
             if header:
                 item = {
                     "label": header,
                     "actual": total,
-                    "budget": 0,
-                    "remaining": 0
+                    "budget": budget,
+                    "remaining": max(0, budget - total) if budget > 0 else 0
                 }
                 if children:
                     item["children"] = children
@@ -404,13 +536,31 @@ def make_committee_key(name: str) -> str:
     return key
 
 
-def process_committee_section(section: dict) -> dict:
-    """Process a single committee section into dashboard format."""
+def process_committee_section(section: dict, budgets: dict = None, parent_path: str = "Expenses") -> dict:
+    """
+    Process a single committee section into dashboard format.
+
+    Args:
+        section: QB P&L section data
+        budgets: Dict of {full_account_path: amount} for budget lookup
+        parent_path: Parent path for building full account paths (usually "Expenses" or "Utilities")
+    """
+    if budgets is None:
+        budgets = {}
+
     header = section.get("Header", {}).get("ColData", [{}])[0].get("value", "")
     summary = section.get("Summary", {}).get("ColData", [])
     total = abs(parse_value(summary[1].get("value", "0"))) if len(summary) >= 2 else 0
 
-    children = extract_expense_tree(section)
+    # Build path for this committee's children
+    # For Utilities, paths are "Utilities:Electricity" not "Utilities:Utilities:Electricity"
+    if parent_path == header:
+        # Parent path IS the header (e.g., Utilities section under Utilities parent)
+        committee_path = header
+    else:
+        committee_path = f"{parent_path}:{header}"
+
+    children = extract_expense_tree(section, budgets, committee_path)
     key = make_committee_key(header)
 
     return {
@@ -418,19 +568,125 @@ def process_committee_section(section: dict) -> dict:
         "name": header,
         "description": f"{header} expenses from QuickBooks.",
         "actual": total,
-        "budget": 0,
+        "budget": 0,  # Committee-level budget set by transform_profit_and_loss
         "remaining": 0,
         "children": children if children else []
     }
 
 
-def transform_profit_and_loss(qb_data: dict) -> dict:
+def parse_budgets(budget_response: dict) -> dict:
+    """
+    Parse QuickBooks Budget entity response into a lookup by account name.
+
+    Returns dict like: {"Utilities": 77850, "Board": 10927, ...}
+    """
+    budgets_by_account = {}
+
+    # Get budgets from QueryResponse
+    budgets = budget_response.get("QueryResponse", {}).get("Budget", [])
+
+    if not budgets:
+        print("No budgets found in QuickBooks")
+        return budgets_by_account
+
+    # Find the current year's P&L budget
+    current_year = datetime.now().year
+    target_budget = None
+
+    for budget in budgets:
+        budget_type = budget.get("BudgetType", "")
+        start_date = budget.get("StartDate", "")
+
+        # Look for P&L budget for current year
+        if budget_type == "ProfitAndLoss" and str(current_year) in start_date:
+            target_budget = budget
+            print(f"Found budget: {budget.get('Name', 'Unnamed')} ({start_date})")
+            break
+
+    if not target_budget:
+        # Try any P&L budget
+        for budget in budgets:
+            if budget.get("BudgetType") == "ProfitAndLoss":
+                target_budget = budget
+                print(f"Using budget: {budget.get('Name', 'Unnamed')}")
+                break
+
+    if not target_budget:
+        print("No P&L budget found")
+        return budgets_by_account
+
+    # Extract budget details by account
+    # QuickBooks uses AccountRef (not Account) for budget line items
+    for detail in target_budget.get("BudgetDetail", []):
+        account_ref = detail.get("AccountRef", {})
+        account_name = account_ref.get("name", "")
+        amount = detail.get("Amount", 0)
+
+        if account_name and amount:
+            # Accumulate amounts for the same account (monthly entries sum to annual)
+            budgets_by_account[account_name] = budgets_by_account.get(account_name, 0) + float(amount)
+
+    print(f"Parsed {len(budgets_by_account)} budget accounts")
+    return budgets_by_account
+
+
+def match_budget_to_committee(committee_name: str, budgets: dict) -> float:
+    """
+    Match a committee name to budget amounts.
+
+    Budget accounts are hierarchical like "Expenses:Board:Tech Team:Internet access"
+    Committee names are top-level like "Board", "Common House", etc.
+    We need to sum all budget entries that belong to a committee.
+    """
+    total = 0
+    name_lower = committee_name.lower()
+
+    # Map committee names to their budget path prefixes
+    committee_prefixes = {
+        "board": ["Expenses:Board"],
+        "common house": ["Expenses:Common House"],
+        "finance committee": ["Expenses:Finance Committee"],
+        "finance": ["Expenses:Finance Committee"],
+        "landscape": ["Expenses:Landscape"],
+        "maintenance": ["Expenses:Maintenance"],
+        "meals": ["Expenses:Meals"],
+        "utilities": ["Utilities:"],  # Utilities are at top level, not under Expenses
+    }
+
+    # Find the matching prefixes for this committee
+    prefixes = committee_prefixes.get(name_lower, [])
+
+    if not prefixes:
+        # Try fuzzy match on committee name
+        for key, val in committee_prefixes.items():
+            if key in name_lower or name_lower in key:
+                prefixes = val
+                break
+
+    # Sum all budget entries that match the prefixes
+    for budget_name, amount in budgets.items():
+        for prefix in prefixes:
+            if budget_name.startswith(prefix):
+                total += amount
+                break
+
+    return total
+
+
+def transform_profit_and_loss(qb_data: dict, budgets: dict = None) -> dict:
     """
     Transform QB P&L to dashboard committee format.
 
     Dashboard expects committees like board, commonHouse, finance, landscape,
     maintenance, meals, utilities - each with actual/budget/remaining and children.
+
+    Args:
+        qb_data: P&L report from QuickBooks
+        budgets: Optional dict of budget amounts by account name
     """
+    if budgets is None:
+        budgets = {}
+
     rows = qb_data.get("Rows", {}).get("Row", [])
 
     # Find Expenses section
@@ -456,18 +712,29 @@ def transform_profit_and_loss(qb_data: dict) -> dict:
                     nested_rows = row.get("Rows", {}).get("Row", [])
                     for nested_row in nested_rows:
                         if nested_row.get("type") == "Section":
-                            committee = process_committee_section(nested_row)
+                            committee = process_committee_section(nested_row, budgets, "Expenses")
+                            # Apply committee-level budget
+                            budget_amount = match_budget_to_committee(committee["name"], budgets)
+                            committee["budget"] = budget_amount
+                            committee["remaining"] = max(0, budget_amount - committee["actual"])
                             committees[committee["key"]] = committee
                 else:
-                    # This is a direct committee
-                    committee = process_committee_section(row)
+                    # This is a direct committee (e.g., Utilities at top level)
+                    # Utilities paths start with "Utilities:" not "Expenses:"
+                    parent_path = header if header == "Utilities" else "Expenses"
+                    committee = process_committee_section(row, budgets, parent_path)
+                    # Apply committee-level budget
+                    budget_amount = match_budget_to_committee(committee["name"], budgets)
+                    committee["budget"] = budget_amount
+                    committee["remaining"] = max(0, budget_amount - committee["actual"])
                     committees[committee["key"]] = committee
 
     return {
         "committees": committees,
         "metadata": {
             "start_period": qb_data.get("Header", {}).get("StartPeriod", ""),
-            "end_period": qb_data.get("Header", {}).get("EndPeriod", "")
+            "end_period": qb_data.get("Header", {}).get("EndPeriod", ""),
+            "budgets_loaded": len(budgets) > 0
         }
     }
 
@@ -602,19 +869,32 @@ def cmd_refresh_data(args):
     config = load_config()
     config = ensure_valid_token(config)
 
+    # Get date range for current year
+    year = datetime.now().year
+    start_of_year = f"{year}-01-01"
+    end_date = datetime.now().strftime("%Y-%m-%d")
+
     # Fetch data from QuickBooks
     balance_sheet_raw = fetch_balance_sheet(config)
     profit_loss_raw = fetch_profit_and_loss(config)
 
-    # Get date range for transactions (current year)
-    year = datetime.now().year
-    start_date = f"{year}-01-01"
-    end_date = datetime.now().strftime("%Y-%m-%d")
-    transactions_raw = fetch_transactions(config, start_date, end_date)
+    # Fetch prior period (start of year) balance sheet for YTD comparison
+    print("Fetching start-of-year balance sheet for comparison...")
+    try:
+        balance_sheet_prior = fetch_balance_sheet_prior(config, start_of_year)
+    except Exception as e:
+        print(f"Warning: Could not fetch prior period data: {e}")
+        balance_sheet_prior = None
 
-    # Transform data to dashboard format
-    cash_data = transform_balance_sheet(balance_sheet_raw)
-    budget_data = transform_profit_and_loss(profit_loss_raw)
+    # Fetch budgets from QuickBooks
+    budget_raw = fetch_budgets(config)
+    budgets = parse_budgets(budget_raw)
+
+    transactions_raw = fetch_transactions(config, start_of_year, end_date)
+
+    # Transform data to dashboard format (with prior period and budget data)
+    cash_data = transform_balance_sheet(balance_sheet_raw, balance_sheet_prior)
+    budget_data = transform_profit_and_loss(profit_loss_raw, budgets)
     summary = create_summary(cash_data, budget_data)
 
     # Write JSON files in dashboard-compatible format
@@ -627,17 +907,37 @@ def cmd_refresh_data(args):
     write_json_file(raw_dir / "balance-sheet-raw.json", balance_sheet_raw)
     write_json_file(raw_dir / "profit-loss-raw.json", profit_loss_raw)
     write_json_file(raw_dir / "transactions-raw.json", transactions_raw)
+    write_json_file(raw_dir / "budgets-raw.json", budget_raw)
+    if balance_sheet_prior:
+        write_json_file(raw_dir / "balance-sheet-prior-raw.json", balance_sheet_prior)
 
     print(f"\nData files written to {DATA_DIR}/")
 
     # Print summary
-    print(f"\n--- Summary ---")
+    print(f"\n--- Cash Summary ---")
     print(f"Bank accounts: ${cash_data['bank']['current']:,.2f}")
+    if cash_data['bank']['prior']:
+        print(f"  (Jan 1: ${cash_data['bank']['prior']:,.2f}, Change: ${cash_data['bank']['change']:,.2f})")
     print(f"Investments:   ${cash_data['investments']['current']:,.2f}")
+    if cash_data['investments']['prior']:
+        print(f"  (Jan 1: ${cash_data['investments']['prior']:,.2f}, Change: ${cash_data['investments']['change']:,.2f})")
     print(f"Total:         ${cash_data['total']['current']:,.2f}")
-    print(f"\nCommittees with expenses:")
+
+    print(f"\n--- Budget vs Actual ---")
+    budgets_found = budget_data.get('metadata', {}).get('budgets_loaded', False)
+    if budgets_found:
+        print("(Budgets loaded from QuickBooks)")
+    else:
+        print("(No budgets found in QuickBooks - showing actuals only)")
+
     for key, committee in budget_data['committees'].items():
-        print(f"  {committee['name']}: ${committee['actual']:,.2f}")
+        budget_amt = committee.get('budget', 0)
+        actual_amt = committee.get('actual', 0)
+        if budget_amt > 0:
+            pct = (actual_amt / budget_amt) * 100
+            print(f"  {committee['name']}: ${actual_amt:,.2f} / ${budget_amt:,.2f} ({pct:.0f}%)")
+        else:
+            print(f"  {committee['name']}: ${actual_amt:,.2f} (no budget)")
 
     # Git operations
     git_commit_and_push(args.dry_run, args.no_push)
