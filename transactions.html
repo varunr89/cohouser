@@ -5,6 +5,72 @@
   <title>BCCA Transaction Detail</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    /* Password overlay */
+    .password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #163457, #275d8c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .password-overlay.hidden { display: none; }
+    .password-box {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 360px;
+      width: 90%;
+    }
+    .password-box h2 {
+      margin: 0 0 0.5rem 0;
+      color: #163457;
+      font-size: 1.4rem;
+    }
+    .password-box p {
+      margin: 0 0 1.5rem 0;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+    .password-box input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .password-box input:focus {
+      outline: none;
+      border-color: #275d8c;
+      box-shadow: 0 0 0 3px rgba(39, 93, 140, 0.1);
+    }
+    .password-box button {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(135deg, #163457, #275d8c);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .password-box button:hover { opacity: 0.9; }
+    .password-box .error {
+      color: #b91c1c;
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+      display: none;
+    }
+    .password-box .error.show { display: block; }
+
     :root {
       --bg: #f5f7fb;
       --card-bg: #ffffff;
@@ -183,6 +249,17 @@
   </style>
 </head>
 <body>
+  <!-- Password Protection Overlay -->
+  <div id="password-overlay" class="password-overlay">
+    <div class="password-box">
+      <h2>BCCA Transaction Detail</h2>
+      <p>Enter password to access financial data</p>
+      <input type="password" id="password-input" placeholder="Password" autocomplete="off" />
+      <button id="password-submit">Access Transactions</button>
+      <div id="password-error" class="error">Incorrect password. Please try again.</div>
+    </div>
+  </div>
+
   <header class="app-header">
     <div class="app-title">Bellingham Cohousing – Transaction Detail</div>
     <div class="app-subtitle">YTD expense transactions by line item</div>
@@ -235,6 +312,55 @@
   </footer>
 
   <script>
+    // ------------------------- Password Protection ---------------------------
+    const PASSWORD_HASH = "c983c585ac3c40d920834f96200066352ff58e323da4dadae1d948fb27e63f82";
+    const SESSION_KEY = "bcca_auth";
+
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function checkPassword() {
+      const input = document.getElementById("password-input");
+      const error = document.getElementById("password-error");
+      const overlay = document.getElementById("password-overlay");
+
+      const hash = await hashPassword(input.value);
+
+      if (hash === PASSWORD_HASH) {
+        sessionStorage.setItem(SESSION_KEY, "true");
+        overlay.classList.add("hidden");
+        loadData();
+      } else {
+        error.classList.add("show");
+        input.value = "";
+        input.focus();
+      }
+    }
+
+    function initAuth() {
+      const overlay = document.getElementById("password-overlay");
+
+      // Check if already authenticated this session
+      if (sessionStorage.getItem(SESSION_KEY) === "true") {
+        overlay.classList.add("hidden");
+        loadData();
+        return;
+      }
+
+      // Set up event listeners
+      document.getElementById("password-submit").addEventListener("click", checkPassword);
+      document.getElementById("password-input").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") checkPassword();
+      });
+      document.getElementById("password-input").focus();
+    }
+
+    // ------------------------- Data ------------------------------------------
     let allTransactions = [];
     let committees = [];
     let accountsByCommittee = {};
@@ -401,7 +527,8 @@
     });
 
     // Initialize
-    document.addEventListener("DOMContentLoaded", loadData);
+    // Initialize auth first - data loads after authentication
+    document.addEventListener("DOMContentLoaded", initAuth);
   </script>
 </body>
 </html>
