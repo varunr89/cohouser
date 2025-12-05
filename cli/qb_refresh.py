@@ -170,25 +170,125 @@ def fetch_budgets(config: dict) -> dict:
         return {"QueryResponse": {}}
 
 
+def fetch_all_paginated(config: dict, base_query: str, entity_type: str) -> list:
+    """Fetch all records with pagination for a given query."""
+    all_records = []
+    start_position = 1
+    max_results = 1000
+
+    while True:
+        query = f"{base_query} STARTPOSITION {start_position} MAXRESULTS {max_results}"
+        result = qb_api_request(config, "query", params={"query": query})
+
+        records = result.get("QueryResponse", {}).get(entity_type, [])
+        if not records:
+            break
+
+        all_records.extend(records)
+
+        if len(records) < max_results:
+            break
+
+        start_position += len(records)
+
+    return all_records
+
+
 def fetch_transactions(config: dict, start_date: str, end_date: str) -> dict:
     """Fetch transactions (purchases and bills) from QuickBooks."""
     print("Fetching transactions...")
 
-    # Fetch purchases
-    purchases = qb_api_request(
+    # Fetch all purchases with pagination
+    purchases = fetch_all_paginated(
         config,
-        "query",
-        params={"query": f"SELECT * FROM Purchase WHERE TxnDate >= '{start_date}' AND TxnDate <= '{end_date}'"}
+        f"SELECT * FROM Purchase WHERE TxnDate >= '{start_date}' AND TxnDate <= '{end_date}'",
+        "Purchase"
     )
+    print(f"  Fetched {len(purchases)} purchases")
 
-    # Fetch bills
-    bills = qb_api_request(
+    # Fetch all bills with pagination
+    bills = fetch_all_paginated(
         config,
-        "query",
-        params={"query": f"SELECT * FROM Bill WHERE TxnDate >= '{start_date}' AND TxnDate <= '{end_date}'"}
+        f"SELECT * FROM Bill WHERE TxnDate >= '{start_date}' AND TxnDate <= '{end_date}'",
+        "Bill"
     )
+    print(f"  Fetched {len(bills)} bills")
 
-    return {"purchases": purchases, "bills": bills}
+    return {
+        "purchases": {"QueryResponse": {"Purchase": purchases}},
+        "bills": {"QueryResponse": {"Bill": bills}}
+    }
+
+
+def fetch_accounts(config: dict) -> dict:
+    """Fetch Chart of Accounts from QuickBooks to get account hierarchy."""
+    print("Fetching Chart of Accounts...")
+
+    # QuickBooks API paginates at 100 records, so we need to fetch all pages
+    all_accounts = []
+    start_position = 1
+    max_results = 1000  # Request larger batches
+
+    while True:
+        result = qb_api_request(
+            config,
+            "query",
+            params={"query": f"SELECT * FROM Account STARTPOSITION {start_position} MAXRESULTS {max_results}"}
+        )
+
+        accounts = result.get("QueryResponse", {}).get("Account", [])
+        if not accounts:
+            break
+
+        all_accounts.extend(accounts)
+
+        # If we got fewer than max_results, we've reached the end
+        if len(accounts) < max_results:
+            break
+
+        start_position += len(accounts)
+
+    return {"QueryResponse": {"Account": all_accounts}}
+
+
+def build_account_mapping(accounts_data: dict) -> dict:
+    """
+    Build a mapping from account ID and name to full hierarchical path.
+
+    Returns dict with two sub-dicts:
+    - by_id: {account_id: full_path}
+    - by_name: {leaf_name: full_path}  (for accounts without ID in transactions)
+    """
+    accounts = accounts_data.get("QueryResponse", {}).get("Account", [])
+
+    # First pass: build id -> account info
+    id_to_account = {}
+    for acct in accounts:
+        acct_id = acct.get("Id")
+        id_to_account[acct_id] = {
+            "name": acct.get("Name", ""),
+            "parent_id": acct.get("ParentRef", {}).get("value"),
+            "full_name": acct.get("FullyQualifiedName", acct.get("Name", "")),
+            "type": acct.get("AccountType", ""),
+            "subtype": acct.get("AccountSubType", ""),
+        }
+
+    # Build mappings
+    by_id = {}
+    by_name = {}
+
+    for acct_id, info in id_to_account.items():
+        full_name = info["full_name"]
+        leaf_name = info["name"]
+
+        by_id[acct_id] = full_name
+
+        # Only map leaf names for expense/utility accounts to avoid collisions
+        if "Expense" in info["type"] or "Utilities" in full_name:
+            if leaf_name not in by_name:
+                by_name[leaf_name] = full_name
+
+    return {"by_id": by_id, "by_name": by_name}
 
 
 # ============================================================================
@@ -743,13 +843,18 @@ def transform_profit_and_loss(qb_data: dict, budgets: dict = None) -> dict:
 # Transaction Transformation
 # ============================================================================
 
-def transform_transactions(raw_data: dict) -> dict:
+def transform_transactions(raw_data: dict, account_mapping: dict = None) -> dict:
     """
     Transform raw QuickBooks purchase data into a flat transaction list.
+
+    Args:
+        raw_data: Raw transaction data from QuickBooks
+        account_mapping: Dict with 'by_id' and 'by_name' mappings to full account paths
 
     Maps each transaction's account path to its committee.
     """
     transactions = []
+    account_mapping = account_mapping or {"by_id": {}, "by_name": {}}
 
     # Map account path prefixes to committee keys
     committee_mapping = {
@@ -774,6 +879,22 @@ def transform_transactions(raw_data: dict) -> dict:
         parts = account_path.split(":")
         return parts[-1] if parts else account_path
 
+    def resolve_account_path(account_ref: dict) -> str:
+        """Resolve account reference to full hierarchical path."""
+        acct_id = account_ref.get("value", "")
+        acct_name = account_ref.get("name", "")
+
+        # Try by ID first (most reliable)
+        if acct_id and acct_id in account_mapping["by_id"]:
+            return account_mapping["by_id"][acct_id]
+
+        # Fall back to name lookup
+        if acct_name and acct_name in account_mapping["by_name"]:
+            return account_mapping["by_name"][acct_name]
+
+        # Last resort: return the name as-is (won't match committee)
+        return acct_name
+
     # Process purchases (checks, credit card charges, etc.)
     purchases = raw_data.get("purchases", {}).get("QueryResponse", {}).get("Purchase", [])
 
@@ -784,7 +905,13 @@ def transform_transactions(raw_data: dict) -> dict:
         # Each purchase can have multiple line items
         for line in purchase.get("Line", []):
             detail = line.get("AccountBasedExpenseLineDetail", {})
-            account_path = detail.get("AccountRef", {}).get("name", "")
+            account_ref = detail.get("AccountRef", {})
+
+            if not account_ref:
+                continue
+
+            # Resolve to full path using the account mapping
+            account_path = resolve_account_path(account_ref)
 
             if not account_path:
                 continue
@@ -971,13 +1098,17 @@ def cmd_refresh_data(args):
 
     transactions_raw = fetch_transactions(config, start_of_year, end_date)
 
+    # Fetch Chart of Accounts for account hierarchy mapping
+    accounts_raw = fetch_accounts(config)
+    account_mapping = build_account_mapping(accounts_raw)
+
     # Transform data to dashboard format (with prior period and budget data)
     cash_data = transform_balance_sheet(balance_sheet_raw, balance_sheet_prior)
     budget_data = transform_profit_and_loss(profit_loss_raw, budgets)
     summary = create_summary(cash_data, budget_data)
 
-    # Transform and write transactions
-    transactions_data = transform_transactions(transactions_raw)
+    # Transform and write transactions (with account mapping for hierarchy)
+    transactions_data = transform_transactions(transactions_raw, account_mapping)
     write_json_file(DATA_DIR / "transactions.json", transactions_data)
 
     # Write JSON files in dashboard-compatible format
@@ -991,6 +1122,7 @@ def cmd_refresh_data(args):
     write_json_file(raw_dir / "profit-loss-raw.json", profit_loss_raw)
     write_json_file(raw_dir / "transactions-raw.json", transactions_raw)
     write_json_file(raw_dir / "budgets-raw.json", budget_raw)
+    write_json_file(raw_dir / "accounts-raw.json", accounts_raw)
     if balance_sheet_prior:
         write_json_file(raw_dir / "balance-sheet-prior-raw.json", balance_sheet_prior)
 
