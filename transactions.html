@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BCCA Transaction Detail</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card-bg: #ffffff;
+      --border-subtle: #e2e8f0;
+      --accent: #275d8c;
+      --accent-soft: #e0edff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #eef3ff 0, #f5f7fb 45%, #f9fafb 100%);
+      color: var(--text-main);
+    }
+
+    .app-header {
+      padding: 1.25rem 2.4rem;
+      background: linear-gradient(135deg, #163457, #275d8c);
+      color: #f9fafb;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+    }
+
+    .app-title { font-size: 1.4rem; font-weight: 600; letter-spacing: 0.04em; }
+    .app-subtitle { font-size: 0.9rem; color: #d1e3ff; margin-top: 0.15rem; }
+
+    .app-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.75rem 2.4rem 2.4rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .filter-bar {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .filter-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+
+    .filter-select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      min-width: 180px;
+      background: white;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      align-self: flex-end;
+    }
+    .filter-btn:hover { background: #f3f4f6; }
+
+    .summary-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .summary-total {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .txn-table-wrap {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .txn-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .txn-table th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      background: #eef2ff;
+      font-weight: 600;
+      color: #1f2937;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .txn-table th.numeric { text-align: right; }
+
+    .txn-table td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: top;
+    }
+
+    .txn-table tr:last-child td { border-bottom: none; }
+
+    .txn-table tr:nth-child(odd) td { background: #fafbfc; }
+    .txn-table tr:nth-child(even) td { background: white; }
+
+    .txn-table td.numeric {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .vendor-name { font-weight: 500; }
+    .vendor-memo {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+
+    .app-footer {
+      padding: 0.9rem 2.4rem 1.1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    @media (max-width: 768px) {
+      .app-header, .app-main, .app-footer { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .filter-select { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-title">Bellingham Cohousing – Transaction Detail</div>
+    <div class="app-subtitle">YTD expense transactions by line item</div>
+  </header>
+
+  <main class="app-main">
+    <a href="BCCAFinance.html" class="back-link">← Back to Dashboard</a>
+
+    <div class="filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">Committee</span>
+        <select id="filter-committee" class="filter-select">
+          <option value="">All Committees</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Account</span>
+        <select id="filter-account" class="filter-select">
+          <option value="">All Accounts</option>
+        </select>
+      </div>
+      <button id="clear-filters" class="filter-btn">Clear filters</button>
+    </div>
+
+    <div class="summary-bar">
+      <span id="txn-count">Loading...</span>
+      <span class="summary-total" id="txn-total"></span>
+    </div>
+
+    <div class="txn-table-wrap">
+      <table class="txn-table">
+        <thead>
+          <tr>
+            <th style="width: 90px;">Date</th>
+            <th>Vendor / Payee</th>
+            <th>Account</th>
+            <th>Committee</th>
+            <th class="numeric" style="width: 100px;">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="txn-body">
+          <tr><td colspan="5" class="empty-state">Loading transactions...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    Data sourced from QuickBooks Online · Refreshed via qb_refresh.py CLI
+  </footer>
+
+  <script>
+    let allTransactions = [];
+    let committees = [];
+    let accountsByCommittee = {};
+
+    const currencyFormatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 2
+    });
+
+    function formatCurrency(value) {
+      return currencyFormatter.format(value);
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const date = new Date(dateStr + "T00:00:00");
+      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    async function loadData() {
+      try {
+        const response = await fetch("data/transactions.json");
+        if (!response.ok) throw new Error("Failed to load transactions");
+        const data = await response.json();
+        allTransactions = data.transactions || [];
+        buildFilterOptions();
+        applyUrlParams();
+        renderTable();
+      } catch (error) {
+        console.error(error);
+        document.getElementById("txn-body").innerHTML =
+          '<tr><td colspan="5" class="empty-state">Error loading data. Try running the HTTP server.</td></tr>';
+      }
+    }
+
+    function buildFilterOptions() {
+      const committeeSet = new Set();
+      accountsByCommittee = { "": new Set() };
+
+      allTransactions.forEach(t => {
+        committeeSet.add(t.committee);
+        if (!accountsByCommittee[t.committee]) {
+          accountsByCommittee[t.committee] = new Set();
+        }
+        accountsByCommittee[t.committee].add(t.account);
+        accountsByCommittee[""].add(t.account);
+      });
+
+      committees = Array.from(committeeSet).sort();
+
+      const committeeSelect = document.getElementById("filter-committee");
+      committees.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        committeeSelect.appendChild(opt);
+      });
+
+      updateAccountOptions();
+    }
+
+    function updateAccountOptions() {
+      const committee = document.getElementById("filter-committee").value;
+      const accountSelect = document.getElementById("filter-account");
+      const currentAccount = accountSelect.value;
+
+      accountSelect.innerHTML = '<option value="">All Accounts</option>';
+
+      const accounts = accountsByCommittee[committee] || accountsByCommittee[""];
+      Array.from(accounts).sort().forEach(a => {
+        const opt = document.createElement("option");
+        opt.value = a;
+        opt.textContent = a;
+        accountSelect.appendChild(opt);
+      });
+
+      // Restore selection if still valid
+      if (Array.from(accounts).includes(currentAccount)) {
+        accountSelect.value = currentAccount;
+      }
+    }
+
+    function applyUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const account = params.get("account");
+      const committee = params.get("committee");
+
+      if (account) {
+        // Find the committee for this account
+        const txn = allTransactions.find(t => t.account === account);
+        if (txn) {
+          document.getElementById("filter-committee").value = txn.committee;
+          updateAccountOptions();
+          document.getElementById("filter-account").value = account;
+        }
+      } else if (committee) {
+        document.getElementById("filter-committee").value = committee;
+        updateAccountOptions();
+      }
+    }
+
+    function getFilteredTransactions() {
+      const committee = document.getElementById("filter-committee").value;
+      const account = document.getElementById("filter-account").value;
+
+      return allTransactions.filter(t => {
+        if (committee && t.committee !== committee) return false;
+        if (account && t.account !== account) return false;
+        return true;
+      });
+    }
+
+    function renderTable() {
+      const filtered = getFilteredTransactions();
+      const tbody = document.getElementById("txn-body");
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No transactions match the current filters.</td></tr>';
+        document.getElementById("txn-count").textContent = "0 transactions";
+        document.getElementById("txn-total").textContent = "";
+        return;
+      }
+
+      const total = filtered.reduce((sum, t) => sum + t.amount, 0);
+      document.getElementById("txn-count").textContent = `${filtered.length} transaction${filtered.length === 1 ? "" : "s"}`;
+      document.getElementById("txn-total").textContent = `Total: ${formatCurrency(total)}`;
+
+      tbody.innerHTML = filtered.map(t => `
+        <tr>
+          <td>${formatDate(t.date)}</td>
+          <td>
+            <div class="vendor-name">${escapeHtml(t.vendor || "(No vendor)")}</div>
+            ${t.memo ? `<div class="vendor-memo">${escapeHtml(t.memo)}</div>` : ""}
+          </td>
+          <td>${escapeHtml(t.account)}</td>
+          <td>${escapeHtml(t.committee)}</td>
+          <td class="numeric">${formatCurrency(t.amount)}</td>
+        </tr>
+      `).join("");
+    }
+
+    // Event listeners
+    document.getElementById("filter-committee").addEventListener("change", () => {
+      updateAccountOptions();
+      renderTable();
+    });
+
+    document.getElementById("filter-account").addEventListener("change", renderTable);
+
+    document.getElementById("clear-filters").addEventListener("click", () => {
+      document.getElementById("filter-committee").value = "";
+      document.getElementById("filter-account").value = "";
+      updateAccountOptions();
+      renderTable();
+      // Clear URL params
+      window.history.replaceState({}, "", window.location.pathname);
+    });
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", loadData);
+  </script>
+</body>
+</html>
