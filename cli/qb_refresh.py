@@ -740,6 +740,85 @@ def transform_profit_and_loss(qb_data: dict, budgets: dict = None) -> dict:
 
 
 # ============================================================================
+# Transaction Transformation
+# ============================================================================
+
+def transform_transactions(raw_data: dict) -> dict:
+    """
+    Transform raw QuickBooks purchase data into a flat transaction list.
+
+    Maps each transaction's account path to its committee.
+    """
+    transactions = []
+
+    # Map account path prefixes to committee keys
+    committee_mapping = {
+        "Expenses:Board": "Board",
+        "Expenses:Common House": "Common House",
+        "Expenses:Finance Committee": "Finance Committee",
+        "Expenses:Landscape": "Landscape",
+        "Expenses:Maintenance": "Maintenance",
+        "Expenses:Meals": "Meals",
+        "Utilities": "Utilities",
+    }
+
+    def get_committee(account_path: str) -> str:
+        """Extract committee from full account path."""
+        for prefix, committee in committee_mapping.items():
+            if account_path.startswith(prefix):
+                return committee
+        return "Other"
+
+    def get_line_item(account_path: str) -> str:
+        """Extract the leaf account name from full path."""
+        parts = account_path.split(":")
+        return parts[-1] if parts else account_path
+
+    # Process purchases (checks, credit card charges, etc.)
+    purchases = raw_data.get("purchases", {}).get("QueryResponse", {}).get("Purchase", [])
+
+    for purchase in purchases:
+        vendor = purchase.get("EntityRef", {}).get("name", "") or ""
+        date = purchase.get("TxnDate", "")
+
+        # Each purchase can have multiple line items
+        for line in purchase.get("Line", []):
+            detail = line.get("AccountBasedExpenseLineDetail", {})
+            account_path = detail.get("AccountRef", {}).get("name", "")
+
+            if not account_path:
+                continue
+
+            # Skip non-expense accounts (like Reserve Expenses)
+            if not account_path.startswith("Expenses:") and not account_path.startswith("Utilities"):
+                continue
+
+            amount = line.get("Amount", 0)
+            memo = line.get("Description", "") or ""
+
+            transactions.append({
+                "date": date,
+                "vendor": vendor,
+                "account": get_line_item(account_path),
+                "accountPath": account_path,
+                "committee": get_committee(account_path),
+                "amount": amount,
+                "memo": memo,
+            })
+
+    # Sort by date descending (newest first)
+    transactions.sort(key=lambda t: t["date"], reverse=True)
+
+    return {
+        "transactions": transactions,
+        "metadata": {
+            "report_date": datetime.now().strftime("%Y-%m-%d"),
+            "transaction_count": len(transactions),
+        }
+    }
+
+
+# ============================================================================
 # Summary Generation
 # ============================================================================
 
@@ -897,6 +976,10 @@ def cmd_refresh_data(args):
     budget_data = transform_profit_and_loss(profit_loss_raw, budgets)
     summary = create_summary(cash_data, budget_data)
 
+    # Transform and write transactions
+    transactions_data = transform_transactions(transactions_raw)
+    write_json_file(DATA_DIR / "transactions.json", transactions_data)
+
     # Write JSON files in dashboard-compatible format
     write_json_file(DATA_DIR / "cash-investments.json", cash_data)
     write_json_file(DATA_DIR / "budget-vs-actual.json", budget_data)
@@ -938,6 +1021,9 @@ def cmd_refresh_data(args):
             print(f"  {committee['name']}: ${actual_amt:,.2f} / ${budget_amt:,.2f} ({pct:.0f}%)")
         else:
             print(f"  {committee['name']}: ${actual_amt:,.2f} (no budget)")
+
+    print(f"\n--- Transactions ---")
+    print(f"Total expense transactions: {transactions_data['metadata']['transaction_count']}")
 
     # Git operations
     git_commit_and_push(args.dry_run, args.no_push)

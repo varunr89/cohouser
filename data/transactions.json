@@ -1,0 +1,935 @@
+{
+  "transactions": [
+    {
+      "date": "2025-11-19",
+      "vendor": "Becky Hale",
+      "account": "Building Work Party",
+      "accountPath": "Expenses:Maintenance:Buildings:Building Work Party",
+      "committee": "Maintenance",
+      "amount": 39.58,
+      "memo": "lunch"
+    },
+    {
+      "date": "2025-11-19",
+      "vendor": "Karen Sheldon",
+      "account": "CH Office Supplies",
+      "accountPath": "Expenses:Common House:CH Office Supplies",
+      "committee": "Common House",
+      "amount": 67.87,
+      "memo": "paper"
+    },
+    {
+      "date": "2025-11-19",
+      "vendor": "",
+      "account": "Parking Improvements",
+      "accountPath": "Expenses:Maintenance:Grounds:Parking Improvements",
+      "committee": "Maintenance",
+      "amount": 38.79,
+      "memo": "paint for marking"
+    },
+    {
+      "date": "2025-11-19",
+      "vendor": "Edwin Simmers",
+      "account": "Zoom",
+      "accountPath": "Expenses:Board:Tech Team:Zoom",
+      "committee": "Board",
+      "amount": 29.99,
+      "memo": "remote"
+    },
+    {
+      "date": "2025-11-19",
+      "vendor": "Becky Hale",
+      "account": "Coffee Purchases",
+      "accountPath": "Expenses:Meals:Morning Coffee:Coffee Purchases",
+      "committee": "Meals",
+      "amount": 6.49,
+      "memo": "1/2 1/2"
+    },
+    {
+      "date": "2025-11-19",
+      "vendor": "Anne George",
+      "account": "Fertilizers, soil, mulches",
+      "accountPath": "Expenses:Landscape:Fertilizers, soil, mulches",
+      "committee": "Landscape",
+      "amount": 37.04,
+      "memo": ""
+    },
+    {
+      "date": "2025-11-19",
+      "vendor": "Blue Line Duct Cleaning",
+      "account": "Dryer vents",
+      "accountPath": "Expenses:Maintenance:Buildings:Dryer vents",
+      "committee": "Maintenance",
+      "amount": 2182.0,
+      "memo": "ACH Withdrawal BLUE LINE HOME S ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-11-19",
+      "vendor": "Gary Bachman",
+      "account": "Parking Improvements",
+      "accountPath": "Expenses:Maintenance:Grounds:Parking Improvements",
+      "committee": "Maintenance",
+      "amount": 176.1,
+      "memo": "spray paint to mark pavement ACH Withdrawal GARY BACHMAN  - O ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-11-17",
+      "vendor": "Jessa Richards",
+      "account": "Child Care",
+      "accountPath": "Expenses:Board:General Meetings:Child Care",
+      "committee": "Board",
+      "amount": 50.0,
+      "memo": ""
+    },
+    {
+      "date": "2025-11-05",
+      "vendor": "Becky Hale",
+      "account": "Work Party Lunches",
+      "accountPath": "Expenses:Common House:Work Party Lunches",
+      "committee": "Common House",
+      "amount": 27.24,
+      "memo": ""
+    },
+    {
+      "date": "2025-11-05",
+      "vendor": "Julie McPheters",
+      "account": "GM Snacks",
+      "accountPath": "Expenses:Board:General Meetings:GM Snacks",
+      "committee": "Board",
+      "amount": 60.85,
+      "memo": ""
+    },
+    {
+      "date": "2025-11-05",
+      "vendor": "Newman CPA",
+      "account": "Audit/Independent Review",
+      "accountPath": "Expenses:Finance Committee:Audit/Independent Review",
+      "committee": "Finance Committee",
+      "amount": 2450.0,
+      "memo": ""
+    },
+    {
+      "date": "2025-11-05",
+      "vendor": "Newman CPA",
+      "account": "Accounting",
+      "accountPath": "Expenses:Finance Committee:Accounting",
+      "committee": "Finance Committee",
+      "amount": 550.0,
+      "memo": "tax return prep 1120"
+    },
+    {
+      "date": "2025-11-05",
+      "vendor": "Lesley Rigg",
+      "account": "Lead paint remediation",
+      "accountPath": "Expenses:Common House:Lead paint remediation",
+      "committee": "Common House",
+      "amount": 75.0,
+      "memo": ""
+    },
+    {
+      "date": "2025-11-05",
+      "vendor": "Legacy Tree Care LLC",
+      "account": "Professional services-Tree Trim",
+      "accountPath": "Expenses:Landscape:Professional services-Tree Trim",
+      "committee": "Landscape",
+      "amount": 790.25,
+      "memo": ""
+    },
+    {
+      "date": "2025-11-05",
+      "vendor": "Karen Sheldon",
+      "account": "Work party lunches",
+      "accountPath": "Expenses:Landscape:Work party lunches",
+      "committee": "Landscape",
+      "amount": 29.96,
+      "memo": ""
+    },
+    {
+      "date": "2025-11-05",
+      "vendor": "Karen Sheldon",
+      "account": "Building Work Party",
+      "accountPath": "Expenses:Maintenance:Buildings:Building Work Party",
+      "committee": "Maintenance",
+      "amount": 30.0,
+      "memo": ""
+    },
+    {
+      "date": "2025-11-05",
+      "vendor": "Julie McPheters",
+      "account": "GM Snacks",
+      "accountPath": "Expenses:Board:General Meetings:GM Snacks",
+      "committee": "Board",
+      "amount": 9.02,
+      "memo": ""
+    },
+    {
+      "date": "2025-11-05",
+      "vendor": "Ed Simmers",
+      "account": "Non-Meal Supplies",
+      "accountPath": "Expenses:Common House:Non-Meal Supplies",
+      "committee": "Common House",
+      "amount": 45.04,
+      "memo": "20 light bulbs for great room"
+    },
+    {
+      "date": "2025-11-04",
+      "vendor": "Fred Meyer",
+      "account": "Pantry",
+      "accountPath": "Expenses:Meals:Meal Team Meals:Pantry",
+      "committee": "Meals",
+      "amount": 9.87,
+      "memo": "milk, butter Debit Card  FRED-MEYER #0025 800 DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-11-04",
+      "vendor": "Maniac Coffee",
+      "account": "Coffee Purchases",
+      "accountPath": "Expenses:Meals:Morning Coffee:Coffee Purchases",
+      "committee": "Meals",
+      "amount": 12.48,
+      "memo": "Debit Card  PAYPAL *MANIAC COFFE DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-11-03",
+      "vendor": "Cascade Natural Gas",
+      "account": "Natural Gas",
+      "accountPath": "Utilities:Natural Gas",
+      "committee": "Utilities",
+      "amount": 100.79,
+      "memo": "ACH Withdrawal Cascade Natural ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-11-03",
+      "vendor": "Cascade Natural Gas",
+      "account": "Natural Gas",
+      "accountPath": "Utilities:Natural Gas",
+      "committee": "Utilities",
+      "amount": 1044.49,
+      "memo": "ACH Withdrawal Cascade Natural ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-11-03",
+      "vendor": "Rackspace email",
+      "account": "Internet access & e-mail",
+      "accountPath": "Expenses:Board:Tech Team:Internet access & e-mail",
+      "committee": "Board",
+      "amount": 31.5,
+      "memo": "Debit Card  RACKSPACE EMAIL DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 30.03,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 33.93,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 108.18,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 18.91,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 27.21,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 40.13,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 98.62,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 47.2,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 31.99,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 30.39,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 33.58,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 11.66,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 22.62,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 61.5,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 46.14,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 56.92,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 283.77,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 216.31,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 25.27,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 43.65,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 28.99,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 60.09,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 39.43,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 23.67,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 12.76,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 23.86,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 40.13,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 22.62,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 57.62,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 44.53,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 98.28,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 39.78,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 50.35,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 26.34,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 14.66,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-31",
+      "vendor": "",
+      "account": "Electricity",
+      "accountPath": "Utilities:Electricity",
+      "committee": "Utilities",
+      "amount": 37.46,
+      "memo": "ACH Withdrawal PUGET SOUND ENER ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-30",
+      "vendor": "Environmental Pest Control",
+      "account": "Pest control",
+      "accountPath": "Expenses:Maintenance:Grounds:Pest control",
+      "committee": "Maintenance",
+      "amount": 419.65,
+      "memo": ""
+    },
+    {
+      "date": "2025-10-30",
+      "vendor": "Zoom",
+      "account": "Zoom",
+      "accountPath": "Expenses:Board:Tech Team:Zoom",
+      "committee": "Board",
+      "amount": 18.51,
+      "memo": "Debit Card  ZOOM.COM 888-799-966 DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-29",
+      "vendor": "Maniac Coffee",
+      "account": "Coffee Purchases",
+      "accountPath": "Expenses:Meals:Morning Coffee:Coffee Purchases",
+      "committee": "Meals",
+      "amount": 12.48,
+      "memo": "Debit Card  PAYPAL *MANIAC COFFE DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-27",
+      "vendor": "Comcast",
+      "account": "Internet access & e-mail",
+      "accountPath": "Expenses:Board:Tech Team:Internet access & e-mail",
+      "committee": "Board",
+      "amount": 263.9,
+      "memo": "ACH Withdrawal COMCAST-XFINITY 8 ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-22",
+      "vendor": "Ridwell",
+      "account": "Trash & Recycling",
+      "accountPath": "Utilities:Trash & Recycling",
+      "committee": "Utilities",
+      "amount": 10.0,
+      "memo": "Debit Card  RIDWELL DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-22",
+      "vendor": "Maniac Coffee",
+      "account": "Coffee Purchases",
+      "accountPath": "Expenses:Meals:Morning Coffee:Coffee Purchases",
+      "committee": "Meals",
+      "amount": 12.48,
+      "memo": "Debit Card  PAYPAL *MANIAC COFFE DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-20",
+      "vendor": "Gather",
+      "account": "Gather and Squarespace",
+      "accountPath": "Expenses:Board:Tech Team:Gather and Squarespace",
+      "committee": "Board",
+      "amount": 100.0,
+      "memo": "ACH Withdrawal Gather  - Gather ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-18",
+      "vendor": "Amazon",
+      "account": "Security",
+      "accountPath": "Expenses:Maintenance:Grounds:Security",
+      "committee": "Maintenance",
+      "amount": 128.17,
+      "memo": "GB new bike shed locks Debit Card  Amazon.com*NU8NV8LQ1 DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-17",
+      "vendor": "",
+      "account": "Water and Sewer",
+      "accountPath": "Utilities:Water and Sewer",
+      "committee": "Utilities",
+      "amount": 2316.07,
+      "memo": "ACH Withdrawal C. OF BELLINGHAM ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-16",
+      "vendor": "Sanitary Service Co.",
+      "account": "Trash & Recycling",
+      "accountPath": "Utilities:Trash & Recycling",
+      "committee": "Utilities",
+      "amount": 637.18,
+      "memo": "ACH Withdrawal SANITARYSERVICE ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-15",
+      "vendor": "Fred Meyer",
+      "account": "Groceries",
+      "accountPath": "Expenses:Meals:Meal Team Meals:Groceries",
+      "committee": "Meals",
+      "amount": 16.47,
+      "memo": "Debit Card FRED-MEYER #0025 800 DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-15",
+      "vendor": "Maniac Coffee",
+      "account": "Coffee Purchases",
+      "accountPath": "Expenses:Meals:Morning Coffee:Coffee Purchases",
+      "committee": "Meals",
+      "amount": 12.48,
+      "memo": "Debit Card  PAYPAL *MANIAC COFFE DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Hardware Sales",
+      "account": "Materials for painting, etc.",
+      "accountPath": "Expenses:Maintenance:Buildings:Materials for painting, etc.",
+      "committee": "Maintenance",
+      "amount": 8.89,
+      "memo": "dt - spray paint, brushes"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Hardware Sales",
+      "account": "Paint and Painting",
+      "accountPath": "Expenses:Common House:Durables Budget:Paint and Painting",
+      "committee": "Common House",
+      "amount": 1.89,
+      "memo": "dt - mask tape"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Hardware Sales",
+      "account": "Workshop expenses",
+      "accountPath": "Expenses:Maintenance:Buildings:Workshop expenses",
+      "committee": "Maintenance",
+      "amount": 8.48,
+      "memo": "? drill bits"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Lowe's",
+      "account": "Furnishings",
+      "accountPath": "Expenses:Common House:Durables Budget:Furnishings",
+      "committee": "Common House",
+      "amount": 109.78,
+      "memo": "lamp shades Debit Card LOWE'S #1631 1050 DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Fantastic Cleaners LLC",
+      "account": "Cleaning",
+      "accountPath": "Expenses:Common House:Cleaning",
+      "committee": "Common House",
+      "amount": 680.0,
+      "memo": "ACH Withdrawal FANTASTIC CLEANE ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Newman CPA",
+      "account": "Accounting",
+      "accountPath": "Expenses:Finance Committee:Accounting",
+      "committee": "Finance Committee",
+      "amount": 40.0,
+      "memo": "electronic filing tax return"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Marie MacWhyte",
+      "account": "Plants and trees",
+      "accountPath": "Expenses:Landscape:Plants and trees",
+      "committee": "Landscape",
+      "amount": 80.97,
+      "memo": "my garden, garden spot"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Marie MacWhyte",
+      "account": "Events",
+      "accountPath": "Expenses:Common House:Events",
+      "committee": "Common House",
+      "amount": 16.52,
+      "memo": "movies"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Julie McPheters",
+      "account": "GM Snacks",
+      "accountPath": "Expenses:Board:General Meetings:GM Snacks",
+      "committee": "Board",
+      "amount": 20.38,
+      "memo": "9/8"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Karen Sheldon",
+      "account": "Groceries",
+      "accountPath": "Expenses:Meals:Meal Team Meals:Groceries",
+      "committee": "Meals",
+      "amount": 268.11,
+      "memo": "?"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Judy Perry",
+      "account": "Retreat/25th Anniversary Celebration",
+      "accountPath": "Expenses:Board:Community Building:Retreat/25th Anniversary Celebration",
+      "committee": "Board",
+      "amount": 523.2,
+      "memo": "25th anniversary t-shirts"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Fantastic Cleaners LLC",
+      "account": "Cleaning",
+      "accountPath": "Expenses:Common House:Cleaning",
+      "committee": "Common House",
+      "amount": 0,
+      "memo": "4258, 4398"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Ed Simmers",
+      "account": "Non-Meal Supplies",
+      "accountPath": "Expenses:Common House:Non-Meal Supplies",
+      "committee": "Common House",
+      "amount": 4.91,
+      "memo": "habitat, lemon squeezer, paper"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Ed Simmers",
+      "account": "Non-Meal Supplies",
+      "accountPath": "Expenses:Common House:Non-Meal Supplies",
+      "committee": "Common House",
+      "amount": 45.5,
+      "memo": "amazon air filter, vacuum filter"
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Catherine Sheldon",
+      "account": "Plants and trees",
+      "accountPath": "Expenses:Landscape:Plants and trees",
+      "committee": "Landscape",
+      "amount": 183.26,
+      "memo": ""
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Anne George",
+      "account": "Hardscape",
+      "accountPath": "Expenses:Landscape:Hardscape",
+      "committee": "Landscape",
+      "amount": 332.18,
+      "memo": ""
+    },
+    {
+      "date": "2025-10-10",
+      "vendor": "Anne George",
+      "account": "Work party lunches",
+      "accountPath": "Expenses:Landscape:Work party lunches",
+      "committee": "Landscape",
+      "amount": 24.68,
+      "memo": ""
+    },
+    {
+      "date": "2025-10-08",
+      "vendor": "Fred Meyer",
+      "account": "Work Party Lunches",
+      "accountPath": "Expenses:Common House:Work Party Lunches",
+      "committee": "Common House",
+      "amount": 3.25,
+      "memo": "Debit Card  FRED-MEYER #0025 800 DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-08",
+      "vendor": "West Mechanical",
+      "account": "Repairs",
+      "accountPath": "Expenses:Common House:Repairs",
+      "committee": "Common House",
+      "amount": 206.01,
+      "memo": "Gas Fireplace Debit Card  WEST MECHANICAL INC. DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-07",
+      "vendor": "Jessa Richards",
+      "account": "Child Care",
+      "accountPath": "Expenses:Board:General Meetings:Child Care",
+      "committee": "Board",
+      "amount": 37.5,
+      "memo": "Check  1049 Check, Draft, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-07",
+      "vendor": "Jessa Richards",
+      "account": "Child Care",
+      "accountPath": "Expenses:Board:General Meetings:Child Care",
+      "committee": "Board",
+      "amount": 43.75,
+      "memo": "Check  1050 Check, Draft, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-03",
+      "vendor": "Fred Meyer",
+      "account": "Groceries",
+      "accountPath": "Expenses:Meals:Meal Team Meals:Groceries",
+      "committee": "Meals",
+      "amount": 3.49,
+      "memo": "Debit Card  FRED-MEYER #0025 800 DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-03",
+      "vendor": "Trader Joe's",
+      "account": "Groceries",
+      "accountPath": "Expenses:Meals:Meal Team Meals:Groceries",
+      "committee": "Meals",
+      "amount": 55.33,
+      "memo": "Debit Card  TRADER JOE S #15 241 DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-03",
+      "vendor": "Rackspace email",
+      "account": "Internet access & e-mail",
+      "accountPath": "Expenses:Board:Tech Team:Internet access & e-mail",
+      "committee": "Board",
+      "amount": 31.5,
+      "memo": "Debit Card  RACKSPACE EMAIL DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-02",
+      "vendor": "Maniac Coffee",
+      "account": "Coffee Purchases",
+      "accountPath": "Expenses:Meals:Morning Coffee:Coffee Purchases",
+      "committee": "Meals",
+      "amount": 12.48,
+      "memo": "Debit Card  MANIAC COFFEE DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-02",
+      "vendor": "Cascade Natural Gas",
+      "account": "Natural Gas",
+      "accountPath": "Utilities:Natural Gas",
+      "committee": "Utilities",
+      "amount": 668.36,
+      "memo": "ACH Withdrawal Cascade Natural ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-10-02",
+      "vendor": "Cascade Natural Gas",
+      "account": "Natural Gas",
+      "accountPath": "Utilities:Natural Gas",
+      "committee": "Utilities",
+      "amount": 81.39,
+      "memo": "ACH Withdrawal Cascade Natural ACH, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-09-30",
+      "vendor": "Zoom",
+      "account": "Zoom",
+      "accountPath": "Expenses:Board:Tech Team:Zoom",
+      "committee": "Board",
+      "amount": 18.51,
+      "memo": "Debit Card  ZOOM.COM 888-799-966 DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-08-30",
+      "vendor": "Zoom",
+      "account": "Zoom",
+      "accountPath": "Expenses:Board:Tech Team:Zoom",
+      "committee": "Board",
+      "amount": 18.51,
+      "memo": "Debit Card  ZOOM.COM 888-799-966 DebitCard, POS, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-03-25",
+      "vendor": "Jessa Richards",
+      "account": "Child Care",
+      "accountPath": "Expenses:Board:General Meetings:Child Care",
+      "committee": "Board",
+      "amount": 0,
+      "memo": "Check  1043 Check, Draft, Withdrawal, Processed"
+    },
+    {
+      "date": "2025-03-22",
+      "vendor": "Jessa Richards",
+      "account": "Child Care",
+      "accountPath": "Expenses:Board:General Meetings:Child Care",
+      "committee": "Board",
+      "amount": 50.0,
+      "memo": ""
+    }
+  ],
+  "metadata": {
+    "report_date": "2025-12-05",
+    "transaction_count": 103
+  }
+}
