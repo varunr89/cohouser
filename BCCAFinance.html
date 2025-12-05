@@ -20,6 +20,12 @@
       --radius-md: 10px;
       --radius-pill: 999px;
       --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.12);
+      /* Type scale */
+      --font-xs: 0.75rem;    /* 12px - badges, chips, footnotes */
+      --font-sm: 0.8125rem;  /* 13px - table data, captions, secondary text */
+      --font-base: 0.875rem; /* 14px - body text, labels */
+      --font-md: 1rem;       /* 16px - card headers */
+      --font-lg: 1.125rem;   /* 18px - panel headers */
     }
 
     * {
@@ -74,7 +80,7 @@
       padding: 0.4rem 0.9rem;
       border-radius: var(--radius-pill);
       background: rgba(15, 23, 42, 0.35);
-      font-size: 0.78rem;
+      font-size: var(--font-xs);
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
@@ -103,13 +109,13 @@
 
     .section-heading {
       margin: 0 0 0.25rem;
-      font-size: 1.05rem;
+      font-size: var(--font-lg);
       font-weight: 600;
     }
 
     .section-subheading {
       margin: 0 0 0.8rem;
-      font-size: 0.82rem;
+      font-size: var(--font-sm);
       color: var(--text-muted);
     }
 
@@ -150,7 +156,7 @@
     }
 
     .cash-card-label {
-      font-size: 0.78rem;
+      font-size: var(--font-xs);
       text-transform: uppercase;
       letter-spacing: 0.12em;
       color: var(--text-muted);
@@ -170,7 +176,7 @@
     }
 
     .cash-card-chip {
-      font-size: 0.75rem;
+      font-size: var(--font-xs);
       border-radius: var(--radius-pill);
       padding: 0.2rem 0.6rem;
       background: var(--accent-soft);
@@ -184,7 +190,7 @@
     }
 
     .cash-card-footnote {
-      font-size: 0.75rem;
+      font-size: var(--font-xs);
       color: var(--text-muted);
     }
 
@@ -209,18 +215,18 @@
 
     .drill-header-main h2 {
       margin: 0;
-      font-size: 1rem;
+      font-size: var(--font-md);
       font-weight: 600;
     }
 
     .drill-header-main p {
       margin: 0.25rem 0 0;
-      font-size: 0.8rem;
+      font-size: var(--font-sm);
       color: var(--text-muted);
     }
 
     .drill-header-tag {
-      font-size: 0.76rem;
+      font-size: var(--font-xs);
       border-radius: var(--radius-pill);
       padding: 0.2rem 0.65rem;
       border: 1px solid rgba(148, 163, 184, 0.8);
@@ -243,7 +249,7 @@
       border: 1px solid rgba(226, 232, 240, 0.9);
       overflow: hidden;
       background: #f9fafb;
-      font-size: 0.8rem;
+      font-size: var(--font-sm);
     }
 
     .drill-header-row,
@@ -256,7 +262,7 @@
 
     .drill-header-row {
       background: #eef2ff;
-      font-size: 0.78rem;
+      font-size: var(--font-xs);
       font-weight: 600;
       color: #1f2937;
       border-bottom: 1px solid rgba(226, 232, 240, 0.9);
@@ -337,7 +343,7 @@
     }
 
     .drill-label {
-      font-size: 0.8rem;
+      font-size: var(--font-sm);
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -408,7 +414,7 @@
     }
 
     .sidebar-title {
-      font-size: 0.9rem;
+      font-size: var(--font-xs);
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -416,7 +422,7 @@
     }
 
     .sidebar-caption {
-      font-size: 0.8rem;
+      font-size: var(--font-sm);
       color: var(--text-muted);
     }
 
@@ -439,7 +445,7 @@
       border-radius: var(--radius-md);
       border: 1px solid transparent;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: var(--font-base);
       color: var(--text-main);
       transition:
         background 0.15s ease,
@@ -468,7 +474,7 @@
     }
 
     .committee-chip {
-      font-size: 0.72rem;
+      font-size: var(--font-xs);
       padding: 0.2rem 0.55rem;
       border-radius: var(--radius-pill);
       background: var(--accent-soft);
@@ -498,18 +504,18 @@
 
     .panel-header-main h2 {
       margin: 0;
-      font-size: 1.1rem;
+      font-size: var(--font-lg);
       font-weight: 600;
     }
 
     .panel-header-main p {
       margin: 0.22rem 0 0;
-      font-size: 0.8rem;
+      font-size: var(--font-sm);
       color: var(--text-muted);
     }
 
     .panel-tag {
-      font-size: 0.76rem;
+      font-size: var(--font-xs);
       border-radius: var(--radius-pill);
       padding: 0.25rem 0.7rem;
       border: 1px solid rgba(148, 163, 184, 0.8);
@@ -541,29 +547,29 @@
       display: flex;
       flex-direction: column;
       gap: 0.35rem;
-      font-size: 0.8rem;
+      font-size: var(--font-sm);
     }
 
     .metric-label {
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      font-size: 0.76rem;
+      font-size: var(--font-xs);
       color: var(--text-muted);
     }
 
     .metric-value {
-      font-size: 1.02rem;
+      font-size: var(--font-md);
       font-weight: 600;
     }
 
     .metric-sub {
-      font-size: 0.76rem;
+      font-size: var(--font-xs);
       color: var(--text-muted);
     }
 
     .metric-pill {
       margin-top: 0.2rem;
-      font-size: 0.72rem;
+      font-size: var(--font-xs);
       border-radius: var(--radius-pill);
       padding: 0.16rem 0.55rem;
       display: inline-flex;
@@ -588,7 +594,7 @@
 
     .committee-notes {
       margin: 0.4rem 0 0.5rem;
-      font-size: 0.78rem;
+      font-size: var(--font-sm);
       color: var(--text-muted);
     }
 
@@ -598,7 +604,7 @@
       border: 1px solid rgba(226, 232, 240, 0.9);
       overflow: hidden;
       background: #f9fafb;
-      font-size: 0.8rem;
+      font-size: var(--font-sm);
     }
 
     .committee-table-header {
@@ -611,7 +617,7 @@
     }
 
     .badge {
-      font-size: 0.72rem;
+      font-size: var(--font-xs);
       border-radius: var(--radius-pill);
       padding: 0.16rem 0.55rem;
       background: rgba(15, 23, 42, 0.05);
@@ -621,16 +627,18 @@
     .committee-table {
       width: 100%;
       border-collapse: collapse;
+      font-size: var(--font-sm);
     }
 
     .committee-table th,
     .committee-table td {
-      padding: 0.4rem 0.8rem;
+      padding: 0.5rem 0.8rem;
       text-align: left;
     }
 
     .committee-table th {
-      font-weight: 500;
+      font-size: var(--font-xs);
+      font-weight: 600;
       color: var(--text-muted);
       border-bottom: 1px solid rgba(226, 232, 240, 0.95);
       background: #f3f4ff;
@@ -651,7 +659,7 @@
 
     .app-footer {
       padding: 0.9rem 2.4rem 1.1rem;
-      font-size: 0.75rem;
+      font-size: var(--font-xs);
       color: var(--text-muted);
       text-align: right;
     }
