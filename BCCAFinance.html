@@ -837,17 +837,17 @@
 
             <section class="metrics-grid" aria-label="Committee metrics">
               <article class="metric-card">
-                <div class="metric-label">Budget (annual)</div>
-                <div class="metric-value" id="metric-budget">$0</div>
-                <div class="metric-sub">
-                  Planned spending for the committee for the full fiscal year.
-                </div>
-              </article>
-              <article class="metric-card">
                 <div class="metric-label">Actual (YTD)</div>
                 <div class="metric-value" id="metric-actual">$0</div>
                 <div class="metric-sub">
                   Expenses booked January–March 2025.
+                </div>
+              </article>
+              <article class="metric-card">
+                <div class="metric-label">Budget (annual)</div>
+                <div class="metric-value" id="metric-budget">$0</div>
+                <div class="metric-sub">
+                  Planned spending for the committee for the full fiscal year.
                 </div>
               </article>
               <article class="metric-card">
@@ -896,8 +896,8 @@
                 <thead>
                   <tr>
                     <th>Committee</th>
-                    <th class="numeric">Budget</th>
                     <th class="numeric">Actual (YTD)</th>
+                    <th class="numeric">Budget</th>
                     <th class="numeric">Remaining</th>
                     <th class="numeric">% used</th>
                   </tr>
@@ -1394,8 +1394,8 @@
 
         tr.innerHTML = `
           <td>${data.name}</td>
-          <td class="numeric">${budgetCell}</td>
           <td class="numeric">${formatCurrency(actual)}</td>
+          <td class="numeric">${budgetCell}</td>
           <td class="numeric">${remainingCell}</td>
           <td class="numeric">${pctCell}</td>
         `;
