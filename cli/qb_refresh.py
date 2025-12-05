@@ -168,142 +168,349 @@ def fetch_transactions(config: dict, start_date: str, end_date: str) -> dict:
     return {"purchases": purchases, "bills": bills}
 
 
-def transform_balance_sheet(qb_data: dict) -> dict:
-    """Transform QB Balance Sheet to our schema."""
+# ============================================================================
+# Balance Sheet Transformation
+# ============================================================================
+
+def parse_value(val: str) -> float:
+    """Parse a currency string to float."""
+    if not val:
+        return 0.0
+    try:
+        return float(str(val).replace(",", ""))
+    except ValueError:
+        return 0.0
+
+
+def find_section_by_group(rows: list, group: str) -> Optional[dict]:
+    """Find a section by its group attribute."""
+    for row in rows:
+        if row.get("group") == group:
+            return row
+        # Recurse into nested rows
+        nested = row.get("Rows", {}).get("Row", [])
+        if nested:
+            result = find_section_by_group(nested, group)
+            if result:
+                return result
+    return None
+
+
+def find_section_by_header(rows: list, header_contains: str) -> Optional[dict]:
+    """Find a section by header text."""
+    for row in rows:
+        header = row.get("Header", {}).get("ColData", [{}])[0].get("value", "")
+        if header_contains.lower() in header.lower():
+            return row
+        # Recurse into nested rows
+        nested = row.get("Rows", {}).get("Row", [])
+        if nested:
+            result = find_section_by_header(nested, header_contains)
+            if result:
+                return result
+    return None
+
+
+def extract_accounts_from_section(section: dict) -> list:
+    """Extract account data from a QB section."""
     accounts = []
-
-    # Navigate QB report structure
-    rows = qb_data.get("Rows", {}).get("Row", [])
-
-    for section in rows:
-        section_name = section.get("Header", {}).get("ColData", [{}])[0].get("value", "")
-
-        # Look for Assets section
-        if "Asset" in section_name:
-            extract_accounts_recursive(section, accounts)
-
-    return {"accounts": accounts, "raw_sections": rows}
-
-
-def extract_accounts_recursive(section: dict, accounts: list, depth: int = 0) -> None:
-    """Recursively extract accounts from nested QB report structure."""
     rows = section.get("Rows", {}).get("Row", [])
 
     for row in rows:
         if row.get("type") == "Data":
-            account = extract_account_from_row(row)
-            if account:
-                accounts.append(account)
+            col_data = row.get("ColData", [])
+            if len(col_data) >= 2:
+                name = col_data[0].get("value", "")
+                balance = parse_value(col_data[1].get("value", "0"))
+                if name and balance != 0:
+                    accounts.append({
+                        "label": name,
+                        "current": balance,
+                        "prior": 0,  # Would need prior period data
+                        "change": 0
+                    })
         elif row.get("type") == "Section":
-            extract_accounts_recursive(row, accounts, depth + 1)
+            # Nested section - extract recursively
+            header = row.get("Header", {}).get("ColData", [{}])[0].get("value", "")
+            summary = row.get("Summary", {}).get("ColData", [])
+            total = parse_value(summary[1].get("value", "0")) if len(summary) >= 2 else 0
+
+            children = extract_accounts_from_section(row)
+
+            if header and (total != 0 or children):
+                accounts.append({
+                    "label": header,
+                    "current": total,
+                    "prior": 0,
+                    "change": 0,
+                    "children": children if children else None
+                })
+
+    # Remove None children
+    for acc in accounts:
+        if "children" in acc and acc["children"] is None:
+            del acc["children"]
+
+    return accounts
 
 
-def extract_account_from_row(row: dict) -> dict | None:
-    """Extract account info from a QB report row."""
-    if row.get("type") == "Data":
-        col_data = row.get("ColData", [])
-        if len(col_data) >= 2:
-            name = col_data[0].get("value", "")
-            balance = col_data[1].get("value", "0")
-            try:
-                balance = float(str(balance).replace(",", ""))
-            except ValueError:
-                balance = 0.0
+def transform_balance_sheet(qb_data: dict) -> dict:
+    """
+    Transform QB Balance Sheet to dashboard format.
 
-            # Determine account type from name
-            account_type = "bank"
-            if "CD" in name or "Certificate" in name:
-                account_type = "cd"
-            elif "Vanguard" in name or "Investment" in name:
-                account_type = "investment"
-
-            return {
-                "name": name,
-                "type": account_type,
-                "balance": balance
-            }
-    return None
-
-
-def transform_profit_and_loss(qb_data: dict) -> dict:
-    """Transform QB P&L to our budget vs actual schema."""
-    committees = {}
-
+    Dashboard expects:
+    {
+        "bank": {
+            "label": "Bank accounts (cash)",
+            "subtitle": "...",
+            "current": 190774,
+            "prior": 185338,
+            "change": 5436,
+            "children": [...]
+        },
+        "investments": {...},
+        "total": {...}
+    }
+    """
     rows = qb_data.get("Rows", {}).get("Row", [])
 
-    for section in rows:
-        header = section.get("Header", {}).get("ColData", [{}])[0].get("value", "")
+    # Find Bank Accounts section
+    bank_section = find_section_by_group(rows, "BankAccounts")
+    bank_accounts = []
+    bank_total = 0
 
-        # Extract expense categories (committees)
-        if "Expense" in header:
-            extract_committees_recursive(section, committees)
+    if bank_section:
+        bank_accounts = extract_accounts_from_section(bank_section)
+        summary = bank_section.get("Summary", {}).get("ColData", [])
+        bank_total = parse_value(summary[1].get("value", "0")) if len(summary) >= 2 else 0
 
-    return {"committees": committees, "raw_sections": rows}
+    # Find Other Current Assets (investments)
+    other_current_section = find_section_by_group(rows, "OtherCurrentAssets")
+    investment_accounts = []
+    investment_total = 0
+
+    if other_current_section:
+        investment_accounts = extract_accounts_from_section(other_current_section)
+        summary = other_current_section.get("Summary", {}).get("ColData", [])
+        investment_total = parse_value(summary[1].get("value", "0")) if len(summary) >= 2 else 0
+
+    # Get total assets
+    total_assets_section = find_section_by_group(rows, "TotalAssets")
+    total_assets = 0
+    if total_assets_section:
+        summary = total_assets_section.get("Summary", {}).get("ColData", [])
+        total_assets = parse_value(summary[1].get("value", "0")) if len(summary) >= 2 else 0
+
+    # Calculate current assets total
+    current_assets_total = bank_total + investment_total
+
+    return {
+        "bank": {
+            "label": "Bank accounts (cash)",
+            "subtitle": "Bank accounts and CDs held at WECU and First Federal.",
+            "current": bank_total,
+            "prior": 0,  # Would need prior period
+            "change": 0,
+            "children": bank_accounts
+        },
+        "investments": {
+            "label": "Investments & CDs (other current assets)",
+            "subtitle": "Other current assets including CDs and Vanguard funds.",
+            "current": investment_total,
+            "prior": 0,
+            "change": 0,
+            "children": investment_accounts
+        },
+        "total": {
+            "label": "Total cash + investments",
+            "subtitle": "Total current assets: bank accounts plus investments.",
+            "current": current_assets_total,
+            "prior": 0,
+            "change": 0,
+            "children": []  # Will reference bank and investments
+        },
+        "metadata": {
+            "report_date": qb_data.get("Header", {}).get("EndPeriod", ""),
+            "total_assets": total_assets
+        }
+    }
 
 
-def extract_committees_recursive(section: dict, committees: dict) -> None:
-    """Recursively extract committee/expense info from QB P&L."""
+# ============================================================================
+# Profit & Loss Transformation
+# ============================================================================
+
+def extract_expense_tree(section: dict) -> list:
+    """Extract expense categories from a P&L section."""
+    items = []
     rows = section.get("Rows", {}).get("Row", [])
 
     for row in rows:
-        if row.get("type") == "Section":
-            header = row.get("Header", {}).get("ColData", [])
-            if header:
-                name = header[0].get("value", "")
+        if row.get("type") == "Data":
+            col_data = row.get("ColData", [])
+            if len(col_data) >= 2:
+                name = col_data[0].get("value", "")
+                actual = abs(parse_value(col_data[1].get("value", "0")))
                 if name:
-                    # Get actual amount from summary
-                    summary = row.get("Summary", {}).get("ColData", [])
-                    actual = 0.0
-                    if len(summary) >= 2:
-                        try:
-                            actual = float(str(summary[1].get("value", "0")).replace(",", ""))
-                        except ValueError:
-                            pass
+                    items.append({
+                        "label": name,
+                        "actual": actual,
+                        "budget": 0,  # Budget from separate source
+                        "remaining": 0
+                    })
+        elif row.get("type") == "Section":
+            header = row.get("Header", {}).get("ColData", [{}])[0].get("value", "")
+            summary = row.get("Summary", {}).get("ColData", [])
+            total = abs(parse_value(summary[1].get("value", "0"))) if len(summary) >= 2 else 0
 
-                    committees[name] = {
-                        "name": name,
-                        "budget": 0,  # Budget comes from separate source
-                        "actual": abs(actual),
-                        "categories": []
-                    }
-            # Continue recursing
-            extract_committees_recursive(row, committees)
+            children = extract_expense_tree(row)
+
+            if header:
+                item = {
+                    "label": header,
+                    "actual": total,
+                    "budget": 0,
+                    "remaining": 0
+                }
+                if children:
+                    item["children"] = children
+                items.append(item)
+
+    return items
 
 
-def create_summary(balance_sheet: dict, budget_vs_actual: dict) -> dict:
-    """Create summary.json from transformed data."""
-    # Calculate totals from balance sheet
-    bank_total = sum(a["balance"] for a in balance_sheet["accounts"] if a["type"] == "bank")
-    investment_total = sum(a["balance"] for a in balance_sheet["accounts"] if a["type"] in ["cd", "investment"])
+def make_committee_key(name: str) -> str:
+    """Convert a committee name to a camelCase key."""
+    key = name.lower().replace(" ", "_").replace("-", "_")
 
-    # Calculate budget totals
-    total_actual = sum(c["actual"] for c in budget_vs_actual["committees"].values())
+    # Map to standard committee keys
+    key_mapping = {
+        "board": "board",
+        "common_house": "commonHouse",
+        "finance_committee": "finance",
+        "landscape": "landscape",
+        "maintenance": "maintenance",
+        "meals": "meals",
+        "utilities": "utilities",
+        "community_building": "communityBuilding",
+        "general_meetings": "generalMeetings",
+        "tech_team": "techTeam",
+    }
 
-    # Get current quarter
+    for pattern, mapped_key in key_mapping.items():
+        if pattern in key:
+            return mapped_key
+
+    return key
+
+
+def process_committee_section(section: dict) -> dict:
+    """Process a single committee section into dashboard format."""
+    header = section.get("Header", {}).get("ColData", [{}])[0].get("value", "")
+    summary = section.get("Summary", {}).get("ColData", [])
+    total = abs(parse_value(summary[1].get("value", "0"))) if len(summary) >= 2 else 0
+
+    children = extract_expense_tree(section)
+    key = make_committee_key(header)
+
+    return {
+        "key": key,
+        "name": header,
+        "description": f"{header} expenses from QuickBooks.",
+        "actual": total,
+        "budget": 0,
+        "remaining": 0,
+        "children": children if children else []
+    }
+
+
+def transform_profit_and_loss(qb_data: dict) -> dict:
+    """
+    Transform QB P&L to dashboard committee format.
+
+    Dashboard expects committees like board, commonHouse, finance, landscape,
+    maintenance, meals, utilities - each with actual/budget/remaining and children.
+    """
+    rows = qb_data.get("Rows", {}).get("Row", [])
+
+    # Find Expenses section
+    expenses_section = None
+    for row in rows:
+        header = row.get("Header", {}).get("ColData", [{}])[0].get("value", "")
+        if "Expense" in header:
+            expenses_section = row
+            break
+
+    committees = {}
+
+    if expenses_section:
+        expense_rows = expenses_section.get("Rows", {}).get("Row", [])
+
+        for row in expense_rows:
+            if row.get("type") == "Section":
+                header = row.get("Header", {}).get("ColData", [{}])[0].get("value", "")
+
+                # Skip the generic "Expenses" wrapper if present
+                if header == "Expenses":
+                    # Process children of Expenses as committees
+                    nested_rows = row.get("Rows", {}).get("Row", [])
+                    for nested_row in nested_rows:
+                        if nested_row.get("type") == "Section":
+                            committee = process_committee_section(nested_row)
+                            committees[committee["key"]] = committee
+                else:
+                    # This is a direct committee
+                    committee = process_committee_section(row)
+                    committees[committee["key"]] = committee
+
+    return {
+        "committees": committees,
+        "metadata": {
+            "start_period": qb_data.get("Header", {}).get("StartPeriod", ""),
+            "end_period": qb_data.get("Header", {}).get("EndPeriod", "")
+        }
+    }
+
+
+# ============================================================================
+# Summary Generation
+# ============================================================================
+
+def create_summary(cash_data: dict, budget_data: dict) -> dict:
+    """Create summary.json combining cash and budget data."""
     now = datetime.now()
     quarter = (now.month - 1) // 3 + 1
 
+    # Cash totals
+    bank_total = cash_data.get("bank", {}).get("current", 0)
+    investment_total = cash_data.get("investments", {}).get("current", 0)
+
+    # Budget totals
+    total_actual = sum(c.get("actual", 0) for c in budget_data.get("committees", {}).values())
+
     committees_list = [
         {
-            "name": name,
-            "budget": data["budget"],
+            "name": data["name"],
             "actual": data["actual"],
+            "budget": data["budget"],
+            "remaining": data["remaining"],
             "percent": (data["actual"] / data["budget"] * 100) if data["budget"] > 0 else 0
         }
-        for name, data in budget_vs_actual["committees"].items()
+        for data in budget_data.get("committees", {}).values()
     ]
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "period": f"{now.year}-Q{quarter}",
+        "report_date": cash_data.get("metadata", {}).get("report_date", ""),
         "cash_investments": {
             "bank_accounts": bank_total,
             "investments_cds": investment_total,
             "total": bank_total + investment_total,
-            "change_from_prior": 0  # Would need historical data
+            "change_from_prior": 0
         },
         "budget_vs_actual": {
-            "total_budget": 0,  # Would need budget data
+            "total_budget": 0,
             "total_actual": total_actual,
             "total_remaining": 0,
             "percent_used": 0,
@@ -311,6 +518,10 @@ def create_summary(balance_sheet: dict, budget_vs_actual: dict) -> dict:
         }
     }
 
+
+# ============================================================================
+# File Writing and Git Operations
+# ============================================================================
 
 def write_json_file(path: Path, data: dict) -> None:
     """Write data to a JSON file."""
@@ -363,6 +574,10 @@ def git_commit_and_push(dry_run: bool, no_push: bool) -> None:
         sys.exit(1)
 
 
+# ============================================================================
+# Commands
+# ============================================================================
+
 def cmd_fetch_tokens(args):
     """Handle --fetch-tokens command."""
     config = load_config()
@@ -397,15 +612,15 @@ def cmd_refresh_data(args):
     end_date = datetime.now().strftime("%Y-%m-%d")
     transactions_raw = fetch_transactions(config, start_date, end_date)
 
-    # Transform data
-    balance_sheet = transform_balance_sheet(balance_sheet_raw)
-    budget_vs_actual = transform_profit_and_loss(profit_loss_raw)
-    summary = create_summary(balance_sheet, budget_vs_actual)
+    # Transform data to dashboard format
+    cash_data = transform_balance_sheet(balance_sheet_raw)
+    budget_data = transform_profit_and_loss(profit_loss_raw)
+    summary = create_summary(cash_data, budget_data)
 
-    # Write JSON files
+    # Write JSON files in dashboard-compatible format
+    write_json_file(DATA_DIR / "cash-investments.json", cash_data)
+    write_json_file(DATA_DIR / "budget-vs-actual.json", budget_data)
     write_json_file(DATA_DIR / "summary.json", summary)
-    write_json_file(DATA_DIR / "balance-sheet.json", balance_sheet)
-    write_json_file(DATA_DIR / "budget-vs-actual.json", budget_vs_actual)
 
     # Store raw responses for debugging (gitignored)
     raw_dir = DATA_DIR / "raw"
@@ -414,6 +629,15 @@ def cmd_refresh_data(args):
     write_json_file(raw_dir / "transactions-raw.json", transactions_raw)
 
     print(f"\nData files written to {DATA_DIR}/")
+
+    # Print summary
+    print(f"\n--- Summary ---")
+    print(f"Bank accounts: ${cash_data['bank']['current']:,.2f}")
+    print(f"Investments:   ${cash_data['investments']['current']:,.2f}")
+    print(f"Total:         ${cash_data['total']['current']:,.2f}")
+    print(f"\nCommittees with expenses:")
+    for key, committee in budget_data['committees'].items():
+        print(f"  {committee['name']}: ${committee['actual']:,.2f}")
 
     # Git operations
     git_commit_and_push(args.dry_run, args.no_push)
