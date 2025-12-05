@@ -343,6 +343,16 @@
       overflow: hidden;
     }
 
+    .drill-link {
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .drill-link:hover {
+      text-decoration: underline;
+    }
+
     .drill-cell {
       min-width: 90px;
       text-align: right;
@@ -1158,9 +1168,19 @@
           toggle.style.marginLeft = `${level * 1.1}rem`;
         }
 
-        const label = document.createElement("span");
-        label.className = "drill-label";
-        label.textContent = node.label;
+        let label;
+        // Make leaf nodes clickable links to transaction detail
+        if (!hasChildren && options.linkLeaves && node.label) {
+          label = document.createElement("a");
+          label.className = "drill-label drill-link";
+          label.textContent = node.label;
+          label.href = `transactions.html?account=${encodeURIComponent(node.label)}`;
+          label.title = "View transactions";
+        } else {
+          label = document.createElement("span");
+          label.className = "drill-label";
+          label.textContent = node.label;
+        }
 
         main.appendChild(toggle);
         main.appendChild(label);
@@ -1307,7 +1327,8 @@
         children: data.children || []
       };
       renderTree(drill, rootNode, committeeColumns, {
-        firstColumnLabel: "Category / line item"
+        firstColumnLabel: "Category / line item",
+        linkLeaves: true
       });
 
       const items = document.querySelectorAll(".committee-item");
