@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>BCCA Finance Dashboard – Q1 2025 Drilldown Mock</title>
+  <title>BCCA Finance Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     /* Password overlay */
@@ -952,8 +952,8 @@
               <article class="metric-card">
                 <div class="metric-label">Actual (YTD)</div>
                 <div class="metric-value" id="metric-actual">$0</div>
-                <div class="metric-sub">
-                  Expenses booked January–March 2025.
+                <div class="metric-sub" id="metric-actual-sub">
+                  Expenses booked year-to-date.
                 </div>
               </article>
               <article class="metric-card">
@@ -1124,10 +1124,12 @@
         committeeTrees = transformCommitteeData(budgetData);
         dataLoaded = true;
 
-        // Update the header with report date
+        // Update the header with report date and period info
         const reportDate = cashData.metadata?.report_date;
+        const startPeriod = budgetData.metadata?.start_period;
+        const endPeriod = budgetData.metadata?.end_period;
         if (reportDate) {
-          updateHeaderDate(reportDate);
+          updateHeaderDate(reportDate, startPeriod, endPeriod);
         }
 
         return true;
@@ -1138,11 +1140,24 @@
       }
     }
 
-    function updateHeaderDate(dateStr) {
+    // Store period info for use in UI
+    let dataPeriodInfo = null;
+
+    function updateHeaderDate(dateStr, startPeriod, endPeriod) {
       // Format date for display
       const date = new Date(dateStr + 'T00:00:00');
       const options = { year: 'numeric', month: 'short', day: 'numeric' };
       const formatted = date.toLocaleDateString('en-US', options);
+
+      // Store period info
+      if (startPeriod && endPeriod) {
+        const startDate = new Date(startPeriod + 'T00:00:00');
+        const endDate = new Date(endPeriod + 'T00:00:00');
+        const monthOptions = { year: 'numeric', month: 'short' };
+        const startFormatted = startDate.toLocaleDateString('en-US', monthOptions);
+        const endFormatted = endDate.toLocaleDateString('en-US', monthOptions);
+        dataPeriodInfo = { start: startFormatted, end: endFormatted };
+      }
 
       // Update header pill
       const headerPill = document.querySelector('.header-pill');
@@ -1160,6 +1175,12 @@
       const panelTag = document.getElementById('committee-panel-tag');
       if (panelTag) {
         panelTag.innerHTML = `<span class="dot"></span>Updated ${formatted}`;
+      }
+
+      // Update actual metric sub text with period range
+      const actualSub = document.getElementById('metric-actual-sub');
+      if (actualSub && dataPeriodInfo) {
+        actualSub.textContent = `Expenses booked ${dataPeriodInfo.start} – ${dataPeriodInfo.end}.`;
       }
 
       // Update cash column labels with the actual report date
@@ -1442,7 +1463,7 @@
       if (title) title.textContent = data.name;
       if (subtitle) {
         subtitle.textContent =
-          "Year‑to‑date spending vs annual budget · January–March 2025";
+          "Year‑to‑date spending vs annual budget";
       }
       if (notes) notes.textContent = data.description;
 
