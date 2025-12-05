@@ -678,15 +678,15 @@
       <div class="app-header-top">
         <div>
           <div class="app-title">
-            Bellingham Cohousing – Finance Dashboard (Q1 2025 Mock)
+            Bellingham Cohousing – Finance Dashboard
           </div>
           <div class="app-subtitle">
-            Cash &amp; investments vs prior period, plus YTD budget vs actual by committee
+            Cash &amp; investments summary, plus YTD expenses by committee (from QuickBooks)
           </div>
         </div>
         <div class="header-pill">
           <span class="dot"></span>
-          Read‑only drilldown · Jan–Mar 2025
+          Loading data...
         </div>
       </div>
     </header>
@@ -696,8 +696,7 @@
       <section aria-label="Cash and investments summary">
         <h1 class="section-heading">Cash &amp; investments</h1>
         <p class="section-subheading">
-          Click any card to drill into the underlying bank and investment accounts. Values compare
-          March&nbsp;31,&nbsp;2025 to the prior period (Feb&nbsp;28,&nbsp;2025).
+          Click any card to drill into the underlying bank and investment accounts.
         </p>
 
         <div class="cash-summary-grid">
@@ -745,7 +744,7 @@
             </div>
             <div class="drill-header-tag">
               <span class="dot"></span>
-              As of March 31, 2025 vs Feb 28, 2025
+              Loading...
             </div>
           </div>
 
@@ -759,7 +758,7 @@
       <section>
         <h1 class="section-heading" style="margin-top: 1.1rem;">YTD budget vs actual</h1>
         <p class="section-subheading">
-          Year‑to‑date expenses by committee (Jan–Mar 2025) against the full‑year budget. Choose a committee to
+          Year‑to‑date expenses by committee against the annual budget. Choose a committee to
           see its summary and drill into categories and line items.
         </p>
 
@@ -808,12 +807,12 @@
               <div class="panel-header-main">
                 <h2 id="committee-title">Board</h2>
                 <p id="committee-subtitle">
-                  Year‑to‑date spending vs annual budget · January–March 2025
+                  Year‑to‑date spending vs annual budget
                 </p>
               </div>
-              <div class="panel-tag">
+              <div class="panel-tag" id="committee-panel-tag">
                 <span class="dot"></span>
-                Updated through March 31, 2025
+                Loading...
               </div>
             </header>
 
@@ -895,789 +894,180 @@
     </main>
 
     <footer class="app-footer">
-      Mock dashboard using BCCA Q1 2025 management report data · For illustration only
+      Data sourced from QuickBooks Online · Refreshed via qb_refresh.py CLI
     </footer>
   </div>
 
   <script>
-    // ------------------------- Data --------------------------------------
+    // ------------------------- Data (loaded from JSON) -----------------------
 
-    const cashRoots = {
-      bank: {
-        label: "Bank accounts (cash)",
-        subtitle:
-          "Bank accounts and CDs held at WECU and First Federal. Start with the total, then expand into CDs and individual accounts.",
-        current: 190774,
-        prior: 185338,
-        change: 5436,
-        children: [
-          {
-            label: "Certificates of deposit (WECU)",
-            current: 158866,
-            prior: 157370,
-            change: 1496,
-            children: [
-              {
-                label: "WECU 1‑yr 5.25% 1/18/26",
-                current: 60595,
-                prior: 60121,
-                change: 474
-              },
-              {
-                label: "WECU 2‑yr 4.45% 3/6/27",
-                current: 98271,
-                prior: 97249,
-                change: 1022
-              }
-            ]
-          },
-          {
-            label: "First Federal checking",
-            current: 100,
-            prior: 100,
-            change: 0
-          },
-          {
-            label: "WECU childcare checking",
-            current: 443,
-            prior: 443,
-            change: 0
-          },
-          {
-            label: "WECU debit card",
-            current: 1383,
-            prior: 539,
-            change: 844
-          },
-          {
-            label: "WECU main checking",
-            current: 26651,
-            prior: 23396,
-            change: 3255
-          },
-          {
-            label: "WECU main savings",
-            current: 2674,
-            prior: 2671,
-            change: 3
-          },
-          {
-            label: "WECU meals checking",
-            current: 657,
-            prior: 819,
-            change: -162
-          }
-        ]
-      },
-      investments: {
-        label: "Investments & CDs (other current assets)",
-        subtitle:
-          "Other current assets including CDs at Goldman, JPMorgan, Morgan Stanley, and Vanguard funds.",
-        current: 370793,
-        prior: 374752,
-        change: -3959,
-        children: [
-          {
-            label: "Petty cash",
-            current: 40,
-            prior: 40,
-            change: 0
-          },
-          {
-            label: "Goldman Sachs CD 4.1% 12/31/25",
-            current: 110000,
-            prior: 110000,
-            change: 0
-          },
-          {
-            label: "JPMorgan CD 4.5% 24 mo 1/6/27",
-            current: 62000,
-            prior: 62000,
-            change: 0
-          },
-          {
-            label: "Morgan Stanley CD 5.05% 10/24/25",
-            current: 104000,
-            prior: 104000,
-            change: 0
-          },
-          {
-            label: "Vanguard (total)",
-            current: 370752,
-            prior: 374712,
-            change: -3959,
-            children: [
-              {
-                label: "Unrealized gain / (loss) – Vanguard",
-                current: 23645,
-                prior: 27885,
-                change: -4240
-              },
-              {
-                label: "Vanguard Bond (VCEB)",
-                current: 38792,
-                prior: 38655,
-                change: 137
-              },
-              {
-                label: "Vanguard Index (VFTAX)",
-                current: 31524,
-                prior: 31383,
-                change: 141
-              },
-              {
-                label: "Vanguard Money Market",
-                current: 791,
-                prior: 788,
-                change: 3
-              }
-            ]
-          }
-        ]
-      },
-      total: {
-        label: "Total cash + investments",
-        subtitle:
-          "Total current assets: all bank accounts plus investments and other current assets.",
-        current: 557155,
-        prior: 557657,
-        change: -502,
-        children: [] // will be filled in from bank + investments
+    // Data will be loaded from JSON files
+    let cashRoots = null;
+    let committeeTrees = null;
+    let dataLoaded = false;
+    let loadError = null;
+
+    // Transform JSON data to dashboard format
+    function transformCashData(data) {
+      // Build the total children from bank and investments
+      const bankData = {
+        ...data.bank,
+        children: data.bank.children || []
+      };
+      const investmentsData = {
+        ...data.investments,
+        children: data.investments.children || []
+      };
+
+      return {
+        bank: bankData,
+        investments: investmentsData,
+        total: {
+          ...data.total,
+          children: [bankData, investmentsData]
+        }
+      };
+    }
+
+    function transformCommitteeData(data) {
+      // Transform children array to include 'label' from parent name for drilldown
+      const committees = {};
+      for (const [key, committee] of Object.entries(data.committees)) {
+        committees[key] = {
+          ...committee,
+          children: committee.children || []
+        };
       }
-    };
+      return committees;
+    }
 
-    // Build children for total root by reusing other roots
-    cashRoots.total.children = [cashRoots.bank, cashRoots.investments];
+    async function loadDashboardData() {
+      try {
+        // Load both JSON files in parallel
+        const [cashResponse, budgetResponse] = await Promise.all([
+          fetch('data/cash-investments.json'),
+          fetch('data/budget-vs-actual.json')
+        ]);
 
-    const committeeTrees = {
-      board: {
-        key: "board",
-        name: "Board",
-        description:
-          "Board‑level expenses including administration, community building, general meetings, and the tech team.",
-        actual: 773,
-        budget: 10927,
-        remaining: 10154,
-        children: [
-          {
-            label: "Administration",
-            actual: 80,
-            budget: 2850,
-            remaining: 2770,
-            children: [
-              {
-                label: "Cohousing network dues",
-                actual: 80,
-                budget: 250,
-                remaining: 170
-              },
-              {
-                label: "Legal and mediation",
-                actual: 0,
-                budget: 2500,
-                remaining: 2500
-              },
-              {
-                label: "Offsite printing",
-                actual: 0,
-                budget: 50,
-                remaining: 50
-              },
-              {
-                label: "Records management",
-                actual: 0,
-                budget: 50,
-                remaining: 50
-              }
-            ]
-          },
-          {
-            label: "Community building",
-            actual: 0,
-            budget: 1775,
-            remaining: 1775,
-            children: [
-              {
-                label: "Annual campout reservations",
-                actual: 0,
-                budget: 275,
-                remaining: 275
-              },
-              {
-                label: "Retreat / 25th anniversary celebration",
-                actual: 0,
-                budget: 1500,
-                remaining: 1500
-              },
-              {
-                label: "Training – Community Support Team",
-                actual: 0,
-                budget: 0,
-                remaining: 0
-              },
-              {
-                label: "Training – Facilitation Team",
-                actual: 0,
-                budget: 0,
-                remaining: 0
-              }
-            ]
-          },
-          {
-            label: "General meetings",
-            actual: 75,
-            budget: 1260,
-            remaining: 1185,
-            children: [
-              {
-                label: "Child care",
-                actual: 75,
-                budget: 900,
-                remaining: 825
-              },
-              {
-                label: "GM snacks",
-                actual: 0,
-                budget: 300,
-                remaining: 300
-              },
-              {
-                label: "GM supplies",
-                actual: 0,
-                budget: 60,
-                remaining: 60
-              }
-            ]
-          },
-          {
-            label: "Tech team",
-            actual: 617,
-            budget: 5042,
-            remaining: 4425,
-            children: [
-              {
-                label: "Gather and Squarespace",
-                actual: 209,
-                budget: 1352,
-                remaining: 1143
-              },
-              {
-                label: "Internet access & e‑mail",
-                actual: 373,
-                budget: 3230,
-                remaining: 2857
-              },
-              {
-                label: "Website hosting & domain",
-                actual: 0,
-                budget: 250,
-                remaining: 250
-              },
-              {
-                label: "Zoom",
-                actual: 35,
-                budget: 210,
-                remaining: 175
-              }
-            ]
-          }
-        ]
-      },
+        if (!cashResponse.ok) {
+          throw new Error(`Failed to load cash-investments.json: ${cashResponse.status}`);
+        }
+        if (!budgetResponse.ok) {
+          throw new Error(`Failed to load budget-vs-actual.json: ${budgetResponse.status}`);
+        }
 
-      commonHouse: {
-        key: "commonHouse",
-        name: "Common House",
-        description:
-          "Common House cleaning, supplies, events, repairs, and durable items such as furnishings and equipment.",
-        actual: 674,
-        budget: 7050,
-        remaining: 6376,
-        children: [
-          {
-            label: "AV; piano tuning / entertainment",
-            actual: 0,
-            budget: 250,
-            remaining: 250
-          },
-          {
-            label: "CH office supplies",
-            actual: 40,
-            budget: 500,
-            remaining: 460
-          },
-          {
-            label: "Cleaning",
-            actual: 765,
-            budget: 4425,
-            remaining: 3660
-          },
-          {
-            label: "Donations – CH use (offset to income)",
-            actual: -460,
-            budget: -1300,
-            remaining: -840
-          },
-          {
-            label: "Durables budget",
-            actual: 25,
-            budget: 775,
-            remaining: 750,
-            children: [
-              {
-                label: "Furnishings",
-                actual: 0,
-                budget: 500,
-                remaining: 500
-              },
-              {
-                label: "Kitchen equipment",
-                actual: 25,
-                budget: 100,
-                remaining: 75
-              },
-              {
-                label: "Paint and painting",
-                actual: 0,
-                budget: 50,
-                remaining: 50
-              },
-              {
-                label: "Playroom (furniture / projects)",
-                actual: 0,
-                budget: 75,
-                remaining: 75
-              },
-              {
-                label: "TAC room",
-                actual: 0,
-                budget: 50,
-                remaining: 50
-              }
-            ]
-          },
-          {
-            label: "Events",
-            actual: 34,
-            budget: 150,
-            remaining: 116
-          },
-          {
-            label: "Lead paint remediation",
-            actual: 6,
-            budget: 150,
-            remaining: 144
-          },
-          {
-            label: "Miscellaneous & unintended",
-            actual: 0,
-            budget: 200,
-            remaining: 200
-          },
-          {
-            label: "Non‑meal supplies",
-            actual: 254,
-            budget: 800,
-            remaining: 546
-          },
-          {
-            label: "Repairs",
-            actual: 0,
-            budget: 1000,
-            remaining: 1000
-          },
-          {
-            label: "Work party lunches",
-            actual: 9,
-            budget: 100,
-            remaining: 91
-          }
-        ]
-      },
+        const cashData = await cashResponse.json();
+        const budgetData = await budgetResponse.json();
 
-      finance: {
-        key: "finance",
-        name: "Finance Committee",
-        description:
-          "Accounting, insurance, audit / independent review, QuickBooks, and other finance‑related costs.",
-        actual: 22143,
-        budget: 37010,
-        remaining: 14867,
-        children: [
-          {
-            label: "Accounting",
-            actual: 0,
-            budget: 225,
-            remaining: 225
-          },
-          {
-            label: "Audit / independent review",
-            actual: 0,
-            budget: 2475,
-            remaining: 2475
-          },
-          {
-            label: "Federal income tax expense",
-            actual: 0,
-            budget: 0,
-            remaining: 0
-          },
-          {
-            label: "Insurance",
-            actual: 21486,
-            budget: 33600,
-            remaining: 12114
-          },
-          {
-            label: "Miscellaneous",
-            actual: 20,
-            budget: 110,
-            remaining: 90
-          },
-          {
-            label: "QuickBooks",
-            actual: 637,
-            budget: 600,
-            remaining: -37
-          },
-          {
-            label: "Reserves study",
-            actual: 0,
-            budget: 0,
-            remaining: 0
-          }
-        ]
-      },
+        // Transform and store data
+        cashRoots = transformCashData(cashData);
+        committeeTrees = transformCommitteeData(budgetData);
+        dataLoaded = true;
 
-      landscape: {
-        key: "landscape",
-        name: "Landscape",
-        description:
-          "Garden and landscape materials, tools, professional services, and work‑party lunches.",
-        actual: 600,
-        budget: 3150,
-        remaining: 2551,
-        children: [
-          {
-            label: "Comptown team",
-            actual: 0,
-            budget: 50,
-            remaining: 50
-          },
-          {
-            label: "Equipment rental",
-            actual: 0,
-            budget: 200,
-            remaining: 200
-          },
-          {
-            label: "Fertilizers, soil, mulches",
-            actual: 0,
-            budget: 350,
-            remaining: 350
-          },
-          {
-            label: "Fuel and oil",
-            actual: 0,
-            budget: 10,
-            remaining: 10
-          },
-          {
-            label: "Garden",
-            actual: 0,
-            budget: 200,
-            remaining: 200
-          },
-          {
-            label: "Landscape rocks",
-            actual: 0,
-            budget: 150,
-            remaining: 150
-          },
-          {
-            label: "Path upgrade edge treatment",
-            actual: 0,
-            budget: 150,
-            remaining: 150
-          },
-          {
-            label: "Plants, starts, and seeds",
-            actual: 0,
-            budget: 300,
-            remaining: 300
-          },
-          {
-            label: "Professional services – tree trim",
-            actual: 600,
-            budget: 1000,
-            remaining: 401
-          },
-          {
-            label: "Tools & tool maintenance",
-            actual: 0,
-            budget: 500,
-            remaining: 500
-          },
-          {
-            label: "Waste corral team",
-            actual: 0,
-            budget: 40,
-            remaining: 40
-          },
-          {
-            label: "Work party lunches",
-            actual: 0,
-            budget: 200,
-            remaining: 200
-          }
-        ]
-      },
+        // Update the header with report date
+        const reportDate = cashData.metadata?.report_date;
+        if (reportDate) {
+          updateHeaderDate(reportDate);
+        }
 
-      maintenance: {
-        key: "maintenance",
-        name: "Maintenance",
-        description:
-          "Building exterior and interior work, grounds, and unpredictable repairs and utility work.",
-        actual: 7105,
-        budget: 18935,
-        remaining: 11830,
-        children: [
-          {
-            label: "Building exterior",
-            actual: 654,
-            budget: 6700,
-            remaining: 6046,
-            children: [
-              {
-                label: "Building work party",
-                actual: 0,
-                budget: 300,
-                remaining: 300
-              },
-              {
-                label: "Exterior unpredictable",
-                actual: 0,
-                budget: 2000,
-                remaining: 2000
-              },
-              {
-                label: "Materials for painting, etc.",
-                actual: 0,
-                budget: 600,
-                remaining: 600
-              },
-              {
-                label: "Upper A stair treads",
-                actual: 0,
-                budget: 1500,
-                remaining: 1500
-              },
-              {
-                label: "Upper gutter cleaning",
-                actual: 654,
-                budget: 1600,
-                remaining: 946
-              },
-              {
-                label: "Workshop expenses",
-                actual: 0,
-                budget: 700,
-                remaining: 700
-              }
-            ]
-          },
-          {
-            label: "Building interior",
-            actual: 932,
-            budget: 6525,
-            remaining: 5593,
-            children: [
-              {
-                label: "Dryer vents",
-                actual: 0,
-                budget: 375,
-                remaining: 375
-              },
-              {
-                label: "Interior unpredictable",
-                actual: 0,
-                budget: 2000,
-                remaining: 2000
-              },
-              {
-                label: "Repairs to heat & water systems",
-                actual: 0,
-                budget: 3000,
-                remaining: 3000
-              },
-              {
-                label: "Smoke alarm check / batteries",
-                actual: 0,
-                budget: 0,
-                remaining: 0
-              },
-              {
-                label: "Sprinklers, fire extinguishers, backflow",
-                actual: 932,
-                budget: 1150,
-                remaining: 218
-              },
-              {
-                label: "Sump pump inspection / repair",
-                actual: 0,
-                budget: 0,
-                remaining: 0
-              }
-            ]
-          },
-          {
-            label: "Grounds",
-            actual: 5520,
-            budget: 5710,
-            remaining: 190,
-            children: [
-              {
-                label: "Grounds unpredictable",
-                actual: 205,
-                budget: 2000,
-                remaining: 1795
-              },
-              {
-                label: "Lighting and electricity",
-                actual: 109,
-                budget: 500,
-                remaining: 391
-              },
-              {
-                label: "Pest control",
-                actual: 87,
-                budget: 2860,
-                remaining: 2773
-              },
-              {
-                label: "Pressure washer",
-                actual: 0,
-                budget: 350,
-                remaining: 350
-              },
-              {
-                label: "Utility repairs",
-                actual: 5119,
-                budget: 0,
-                remaining: -5119
-              }
-            ]
-          }
-        ]
-      },
-
-      meals: {
-        key: "meals",
-        name: "Meals",
-        description:
-          "Community meals, celebrations, pantry supplies, and coffee – net of billings back to members.",
-        actual: 57,
-        budget: 950,
-        remaining: 893,
-        children: [
-          {
-            label: "Celebrations",
-            actual: 82,
-            budget: 600,
-            remaining: 518,
-            children: [
-              {
-                label: "Community celebrations",
-                actual: 82,
-                budget: 600,
-                remaining: 518
-              }
-            ]
-          },
-          {
-            label: "Meal team meals",
-            actual: 48,
-            budget: 350,
-            remaining: 302,
-            children: [
-              {
-                label: "Groceries",
-                actual: 938,
-                budget: 0,
-                remaining: -938
-              },
-              {
-                label: "Meals billed to members",
-                actual: -955,
-                budget: 0,
-                remaining: 955
-              },
-              {
-                label: "Pantry",
-                actual: 64,
-                budget: 350,
-                remaining: 286
-              }
-            ]
-          },
-          {
-            label: "Morning coffee",
-            actual: -115,
-            budget: 0,
-            remaining: 115,
-            children: [
-              {
-                label: "Coffee billed to members",
-                actual: -231,
-                budget: 0,
-                remaining: 231
-              },
-              {
-                label: "Coffee purchases",
-                actual: 116,
-                budget: 0,
-                remaining: -116
-              }
-            ]
-          }
-        ]
-      },
-
-      utilities: {
-        key: "utilities",
-        name: "Utilities",
-        description:
-          "Electricity, natural gas, trash and recycling, and water and sewer for the community.",
-        actual: 17465,
-        budget: 77850,
-        remaining: 60385,
-        children: [
-          {
-            label: "Electricity",
-            actual: 4117,
-            budget: 20200,
-            remaining: 16083
-          },
-          {
-            label: "Natural gas",
-            actual: 8463,
-            budget: 24300,
-            remaining: 15837
-          },
-          {
-            label: "Trash & recycling",
-            actual: 1030,
-            budget: 7450,
-            remaining: 6420
-          },
-          {
-            label: "Water and sewer",
-            actual: 3856,
-            budget: 25900,
-            remaining: 22044
-          }
-        ]
+        return true;
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        loadError = error.message;
+        return false;
       }
-    };
+    }
+
+    function updateHeaderDate(dateStr) {
+      // Format date for display
+      const date = new Date(dateStr + 'T00:00:00');
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      const formatted = date.toLocaleDateString('en-US', options);
+
+      // Update header pill
+      const headerPill = document.querySelector('.header-pill');
+      if (headerPill) {
+        headerPill.innerHTML = `<span class="dot"></span>Live data · As of ${formatted}`;
+      }
+
+      // Update drill header tag
+      const drillTag = document.querySelector('.drill-header-tag');
+      if (drillTag) {
+        drillTag.innerHTML = `<span class="dot"></span>As of ${formatted}`;
+      }
+
+      // Update committee panel tag
+      const panelTag = document.getElementById('committee-panel-tag');
+      if (panelTag) {
+        panelTag.innerHTML = `<span class="dot"></span>Updated ${formatted}`;
+      }
+
+      // Update cash column labels with the actual report date
+      updateCashColumnLabels(dateStr);
+    }
+
+    function showLoadError(message) {
+      const mainEl = document.querySelector('.app-main');
+      if (mainEl) {
+        mainEl.innerHTML = `
+          <div style="display: flex; justify-content: center; align-items: center;
+                      min-height: 50vh; font-family: sans-serif;">
+            <div style="text-align: center; padding: 40px; background: white;
+                        border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+              <h2 style="color: #b91c1c; margin: 0 0 1rem;">Unable to Load Data</h2>
+              <p style="color: #666; margin: 0 0 1rem;">${message}</p>
+              <p style="color: #888; font-size: 0.9rem;">
+                Try running: <code style="background: #f3f4f6; padding: 0.2rem 0.5rem; border-radius: 4px;">python -m http.server 8000</code>
+              </p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function updateCashCards() {
+      if (!cashRoots) return;
+
+      // Update bank card
+      const bankValue = document.querySelector('[data-cash-current="bank"]');
+      if (bankValue && cashRoots.bank) {
+        bankValue.textContent = formatCurrency(cashRoots.bank.current);
+      }
+
+      // Update investments card
+      const invValue = document.querySelector('[data-cash-current="investments"]');
+      if (invValue && cashRoots.investments) {
+        invValue.textContent = formatCurrency(cashRoots.investments.current);
+      }
+
+      // Update total card
+      const totalValue = document.querySelector('[data-cash-current="total"]');
+      if (totalValue && cashRoots.total) {
+        totalValue.textContent = formatCurrency(cashRoots.total.current);
+      }
+
+      // Update change chips - show YTD change vs Jan 1
+      const cards = document.querySelectorAll('.cash-card');
+      cards.forEach(card => {
+        const rootKey = card.dataset.cashRoot;
+        const root = cashRoots[rootKey];
+        if (root) {
+          const chip = card.querySelector('.cash-card-chip');
+          if (chip && root.change !== undefined) {
+            const change = root.change;
+            if (change === 0 && root.prior === 0) {
+              // No prior period data available
+              chip.textContent = 'YTD change pending';
+              chip.classList.remove('negative');
+            } else {
+              const sign = change >= 0 ? '▲' : '▼';
+              chip.textContent = `${sign} ${formatCurrency(Math.abs(change))} YTD`;
+              chip.classList.toggle('negative', change < 0);
+            }
+          }
+        }
+      });
+    }
 
     const committeeColumns = [
       { key: "actual", label: "Actual (YTD)" },
@@ -1685,11 +1075,20 @@
       { key: "remaining", label: "Remaining" }
     ];
 
-    const cashColumns = [
-      { key: "current", label: "Mar 31, 2025" },
-      { key: "prior", label: "Feb 28, 2025" },
-      { key: "change", label: "Change" }
+    // Cash columns - will be updated with actual dates from data
+    let cashColumns = [
+      { key: "current", label: "Current" },
+      { key: "prior", label: "Jan 1, 2025" },
+      { key: "change", label: "Change (YTD)" }
     ];
+
+    function updateCashColumnLabels(reportDate) {
+      if (!reportDate) return;
+      const date = new Date(reportDate + 'T00:00:00');
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      const formatted = date.toLocaleDateString('en-US', options);
+      cashColumns[0].label = formatted;
+    }
 
     // ------------------------- Helpers -----------------------------------
 
@@ -1926,8 +1325,13 @@
         if (data && chip) {
           const budget = data.budget || 0;
           const actual = data.actual || 0;
-          const pct = budget > 0 ? (actual / budget) * 100 : 0;
-          chip.textContent = `${pct.toFixed(0)}% used`;
+          if (budget > 0) {
+            const pct = (actual / budget) * 100;
+            chip.textContent = `${pct.toFixed(0)}% used`;
+          } else {
+            // No budget data - show actual amount instead
+            chip.textContent = formatCurrency(actual);
+          }
         }
 
         item.addEventListener("click", () => {
@@ -1948,15 +1352,19 @@
         const tr = document.createElement("tr");
         const budget = data.budget || 0;
         const actual = data.actual || 0;
-        const remaining = data.remaining ?? budget - actual;
+        const remaining = data.remaining ?? (budget > 0 ? budget - actual : 0);
         const pct = budget > 0 ? (actual / budget) * 100 : 0;
+
+        const budgetCell = budget > 0 ? formatCurrency(budget) : '—';
+        const remainingCell = budget > 0 ? formatCurrency(remaining) : '—';
+        const pctCell = budget > 0 ? `${pct.toFixed(1).replace(/\.0$/, "")}%` : '—';
 
         tr.innerHTML = `
           <td>${data.name}</td>
-          <td class="numeric">${formatCurrency(budget)}</td>
+          <td class="numeric">${budgetCell}</td>
           <td class="numeric">${formatCurrency(actual)}</td>
-          <td class="numeric">${formatCurrency(remaining)}</td>
-          <td class="numeric">${pct.toFixed(1).replace(/\\.0$/, "")}%</td>
+          <td class="numeric">${remainingCell}</td>
+          <td class="numeric">${pctCell}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -1964,10 +1372,24 @@
 
     // ------------------------- Init --------------------------------------
 
-    document.addEventListener("DOMContentLoaded", () => {
+    async function initDashboard() {
+      // Load data from JSON files
+      const success = await loadDashboardData();
+
+      if (!success) {
+        showLoadError(loadError || 'Failed to load financial data');
+        return;
+      }
+
+      // Update UI with loaded data
+      updateCashCards();
       initCashCards();
       initCommitteeSidebar();
       renderCommitteeTable();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initDashboard();
     });
   </script>
 </body>
