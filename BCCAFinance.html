@@ -315,7 +315,7 @@
 
     .drill-toggle::before {
       content: "▸";
-      font-size: 0.7rem;
+      font-size: 1rem;
       color: var(--text-muted);
       transition: transform 0.16s ease-out, color 0.16s ease-out;
     }
@@ -351,6 +351,15 @@
 
     .drill-link:hover {
       text-decoration: underline;
+    }
+
+    .drill-label.expandable {
+      cursor: pointer;
+      color: var(--text-main);
+    }
+
+    .drill-label.expandable:hover {
+      color: var(--accent);
     }
 
     .drill-cell {
@@ -1178,7 +1187,7 @@
           label.title = "View transactions";
         } else {
           label = document.createElement("span");
-          label.className = "drill-label";
+          label.className = hasChildren ? "drill-label expandable" : "drill-label";
           label.textContent = node.label;
         }
 
@@ -1221,11 +1230,14 @@
             childrenWrap.style.display = "block";
           }
 
-          toggle.addEventListener("click", (event) => {
+          const toggleExpand = (event) => {
             event.stopPropagation();
             const isOpen = row.classList.toggle("open");
             childrenWrap.style.display = isOpen ? "block" : "none";
-          });
+          };
+
+          toggle.addEventListener("click", toggleExpand);
+          label.addEventListener("click", toggleExpand);
         }
 
         if (hasChildren) {
