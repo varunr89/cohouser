@@ -1,0 +1,1662 @@
+{
+  "Header": {
+    "Time": "2025-12-05T06:31:58-08:00",
+    "ReportName": "ProfitAndLoss",
+    "DateMacro": "this calendar year-to-date",
+    "ReportBasis": "Accrual",
+    "StartPeriod": "2025-01-01",
+    "EndPeriod": "2025-12-05",
+    "SummarizeColumnsBy": "Total",
+    "Currency": "USD",
+    "Option": [
+      {
+        "Name": "AccountingStandard",
+        "Value": "GAAP"
+      },
+      {
+        "Name": "NoReportData",
+        "Value": "false"
+      }
+    ]
+  },
+  "Columns": {
+    "Column": [
+      {
+        "ColTitle": "",
+        "ColType": "Account",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "account"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Total",
+        "ColType": "Money",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "total"
+          }
+        ]
+      }
+    ]
+  },
+  "Rows": {
+    "Row": [
+      {
+        "Header": {
+          "ColData": [
+            {
+              "value": "Income"
+            },
+            {
+              "value": ""
+            }
+          ]
+        },
+        "Rows": {
+          "Row": [
+            {
+              "Header": {
+                "ColData": [
+                  {
+                    "value": "Assessments",
+                    "id": "257"
+                  },
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              "Rows": {
+                "Row": [
+                  {
+                    "ColData": [
+                      {
+                        "value": "Covered Parking",
+                        "id": "415"
+                      },
+                      {
+                        "value": "6061.20"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Dues-Operating",
+                        "id": "360"
+                      },
+                      {
+                        "value": "71961.28"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Dues-Utilities",
+                        "id": "361"
+                      },
+                      {
+                        "value": "77849.16"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Parking Fines & Charges",
+                        "id": "277"
+                      },
+                      {
+                        "value": "40.00"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Resale Certificates",
+                        "id": "403"
+                      },
+                      {
+                        "value": "300.00"
+                      }
+                    ],
+                    "type": "Data"
+                  }
+                ]
+              },
+              "Summary": {
+                "ColData": [
+                  {
+                    "value": "Total Assessments"
+                  },
+                  {
+                    "value": "156211.64"
+                  }
+                ]
+              },
+              "type": "Section"
+            }
+          ]
+        },
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Total Income"
+            },
+            {
+              "value": "156211.64"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "Income"
+      },
+      {
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Gross Profit"
+            },
+            {
+              "value": "156211.64"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "GrossProfit"
+      },
+      {
+        "Header": {
+          "ColData": [
+            {
+              "value": "Expenses"
+            },
+            {
+              "value": ""
+            }
+          ]
+        },
+        "Rows": {
+          "Row": [
+            {
+              "Header": {
+                "ColData": [
+                  {
+                    "value": "Expenses",
+                    "id": "30"
+                  },
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              "Rows": {
+                "Row": [
+                  {
+                    "Header": {
+                      "ColData": [
+                        {
+                          "value": "Board",
+                          "id": "72"
+                        },
+                        {
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "Rows": {
+                      "Row": [
+                        {
+                          "Header": {
+                            "ColData": [
+                              {
+                                "value": "Community Building",
+                                "id": "320"
+                              },
+                              {
+                                "value": ""
+                              }
+                            ]
+                          },
+                          "Rows": {
+                            "Row": [
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Annual Campout Reservations",
+                                    "id": "455"
+                                  },
+                                  {
+                                    "value": "176.00"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Retreat/25th Anniversary Celebration",
+                                    "id": "491"
+                                  },
+                                  {
+                                    "value": "1314.75"
+                                  }
+                                ],
+                                "type": "Data"
+                              }
+                            ]
+                          },
+                          "Summary": {
+                            "ColData": [
+                              {
+                                "value": "Total Community Building"
+                              },
+                              {
+                                "value": "1490.75"
+                              }
+                            ]
+                          },
+                          "type": "Section"
+                        },
+                        {
+                          "Header": {
+                            "ColData": [
+                              {
+                                "value": "General Meetings",
+                                "id": "318"
+                              },
+                              {
+                                "value": ""
+                              }
+                            ]
+                          },
+                          "Rows": {
+                            "Row": [
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Child Care",
+                                    "id": "438"
+                                  },
+                                  {
+                                    "value": "400.00"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "GM Snacks",
+                                    "id": "408"
+                                  },
+                                  {
+                                    "value": "129.32"
+                                  }
+                                ],
+                                "type": "Data"
+                              }
+                            ]
+                          },
+                          "Summary": {
+                            "ColData": [
+                              {
+                                "value": "Total General Meetings"
+                              },
+                              {
+                                "value": "529.32"
+                              }
+                            ]
+                          },
+                          "type": "Section"
+                        },
+                        {
+                          "Header": {
+                            "ColData": [
+                              {
+                                "value": "Tech Team",
+                                "id": "249"
+                              },
+                              {
+                                "value": ""
+                              }
+                            ]
+                          },
+                          "Rows": {
+                            "Row": [
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Gather and Squarespace",
+                                    "id": "334"
+                                  },
+                                  {
+                                    "value": "1270.92"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Internet access & e-mail",
+                                    "id": "461"
+                                  },
+                                  {
+                                    "value": "1919.07"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Zoom",
+                                    "id": "275"
+                                  },
+                                  {
+                                    "value": "192.26"
+                                  }
+                                ],
+                                "type": "Data"
+                              }
+                            ]
+                          },
+                          "Summary": {
+                            "ColData": [
+                              {
+                                "value": "Total Tech Team"
+                              },
+                              {
+                                "value": "3382.25"
+                              }
+                            ]
+                          },
+                          "type": "Section"
+                        }
+                      ]
+                    },
+                    "Summary": {
+                      "ColData": [
+                        {
+                          "value": "Total Board"
+                        },
+                        {
+                          "value": "5402.32"
+                        }
+                      ]
+                    },
+                    "type": "Section"
+                  },
+                  {
+                    "Header": {
+                      "ColData": [
+                        {
+                          "value": "Common House",
+                          "id": "88"
+                        },
+                        {
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "Rows": {
+                      "Row": [
+                        {
+                          "ColData": [
+                            {
+                              "value": "AV; piano tuning (entertainment",
+                              "id": "97"
+                            },
+                            {
+                              "value": "80.00"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "CH Office Supplies",
+                              "id": "212"
+                            },
+                            {
+                              "value": "176.38"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Cleaning",
+                              "id": "386"
+                            },
+                            {
+                              "value": "3315.00"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Donations - CH use",
+                              "id": "189"
+                            },
+                            {
+                              "value": "-1405.00"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "Header": {
+                            "ColData": [
+                              {
+                                "value": "Durables Budget",
+                                "id": "99"
+                              },
+                              {
+                                "value": ""
+                              }
+                            ]
+                          },
+                          "Rows": {
+                            "Row": [
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Furnishings",
+                                    "id": "115"
+                                  },
+                                  {
+                                    "value": "199.26"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Kitchen equipment",
+                                    "id": "478"
+                                  },
+                                  {
+                                    "value": "78.16"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Paint and Painting",
+                                    "id": "156"
+                                  },
+                                  {
+                                    "value": "1.89"
+                                  }
+                                ],
+                                "type": "Data"
+                              }
+                            ]
+                          },
+                          "Summary": {
+                            "ColData": [
+                              {
+                                "value": "Total Durables Budget"
+                              },
+                              {
+                                "value": "279.31"
+                              }
+                            ]
+                          },
+                          "type": "Section"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Events",
+                              "id": "299"
+                            },
+                            {
+                              "value": "50.55"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Lead paint remediation",
+                              "id": "191"
+                            },
+                            {
+                              "value": "80.98"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Miscellaneous & unintended",
+                              "id": "95"
+                            },
+                            {
+                              "value": "92.12"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Non-Meal Supplies",
+                              "id": "91"
+                            },
+                            {
+                              "value": "698.53"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Repairs",
+                              "id": "367"
+                            },
+                            {
+                              "value": "385.95"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Work Party Lunches",
+                              "id": "219"
+                            },
+                            {
+                              "value": "111.36"
+                            }
+                          ],
+                          "type": "Data"
+                        }
+                      ]
+                    },
+                    "Summary": {
+                      "ColData": [
+                        {
+                          "value": "Total Common House"
+                        },
+                        {
+                          "value": "3865.18"
+                        }
+                      ]
+                    },
+                    "type": "Section"
+                  },
+                  {
+                    "Header": {
+                      "ColData": [
+                        {
+                          "value": "Finance Committee",
+                          "id": "42"
+                        },
+                        {
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "Rows": {
+                      "Row": [
+                        {
+                          "ColData": [
+                            {
+                              "value": "Accounting",
+                              "id": "364"
+                            },
+                            {
+                              "value": "590.00"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Audit/Independent Review",
+                              "id": "132"
+                            },
+                            {
+                              "value": "2450.00"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Insurance",
+                              "id": "74"
+                            },
+                            {
+                              "value": "33074.75"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Miscellaneous",
+                              "id": "372"
+                            },
+                            {
+                              "value": "96.90"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Penalty expense",
+                              "id": "124"
+                            },
+                            {
+                              "value": "2.00"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "QuickBooks",
+                              "id": "333"
+                            },
+                            {
+                              "value": "718.96"
+                            }
+                          ],
+                          "type": "Data"
+                        }
+                      ]
+                    },
+                    "Summary": {
+                      "ColData": [
+                        {
+                          "value": "Total Finance Committee"
+                        },
+                        {
+                          "value": "36932.61"
+                        }
+                      ]
+                    },
+                    "type": "Section"
+                  },
+                  {
+                    "Header": {
+                      "ColData": [
+                        {
+                          "value": "Landscape",
+                          "id": "92"
+                        },
+                        {
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "Rows": {
+                      "Row": [
+                        {
+                          "ColData": [
+                            {
+                              "value": "Fertilizers, soil, mulches",
+                              "id": "380"
+                            },
+                            {
+                              "value": "161.56"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Hardscape",
+                              "id": "336"
+                            },
+                            {
+                              "value": "357.89"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Plants and trees",
+                              "id": "462"
+                            },
+                            {
+                              "value": "328.58"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Professional services-Tree Trim",
+                              "id": "157"
+                            },
+                            {
+                              "value": "1389.75"
+                            }
+                          ],
+                          "type": "Data"
+                        },
+                        {
+                          "ColData": [
+                            {
+                              "value": "Work party lunches",
+                              "id": "458"
+                            },
+                            {
+                              "value": "123.97"
+                            }
+                          ],
+                          "type": "Data"
+                        }
+                      ]
+                    },
+                    "Summary": {
+                      "ColData": [
+                        {
+                          "value": "Total Landscape"
+                        },
+                        {
+                          "value": "2361.75"
+                        }
+                      ]
+                    },
+                    "type": "Section"
+                  },
+                  {
+                    "Header": {
+                      "ColData": [
+                        {
+                          "value": "Maintenance",
+                          "id": "32"
+                        },
+                        {
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "Rows": {
+                      "Row": [
+                        {
+                          "Header": {
+                            "ColData": [
+                              {
+                                "value": "Buildings",
+                                "id": "305"
+                              },
+                              {
+                                "value": ""
+                              }
+                            ]
+                          },
+                          "Rows": {
+                            "Row": [
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Building Work Party",
+                                    "id": "309"
+                                  },
+                                  {
+                                    "value": "149.73"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Buildings Unpredictable",
+                                    "id": "316"
+                                  },
+                                  {
+                                    "value": "713.86"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Dryer vents",
+                                    "id": "313"
+                                  },
+                                  {
+                                    "value": "379.53"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Materials for painting, etc.",
+                                    "id": "365"
+                                  },
+                                  {
+                                    "value": "95.15"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Repairs to heat, water systems",
+                                    "id": "379"
+                                  },
+                                  {
+                                    "value": "568.17"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Sprinklers, fire extin., bk flo",
+                                    "id": "436"
+                                  },
+                                  {
+                                    "value": "1569.17"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Upper A Stair Treads",
+                                    "id": "330"
+                                  },
+                                  {
+                                    "value": "190.00"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Upper gutter cleaning",
+                                    "id": "466"
+                                  },
+                                  {
+                                    "value": "654.00"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Utility repairs",
+                                    "id": "317"
+                                  },
+                                  {
+                                    "value": "5118.85"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Workshop expenses",
+                                    "id": "432"
+                                  },
+                                  {
+                                    "value": "53.36"
+                                  }
+                                ],
+                                "type": "Data"
+                              }
+                            ]
+                          },
+                          "Summary": {
+                            "ColData": [
+                              {
+                                "value": "Total Buildings"
+                              },
+                              {
+                                "value": "9491.82"
+                              }
+                            ]
+                          },
+                          "type": "Section"
+                        },
+                        {
+                          "Header": {
+                            "ColData": [
+                              {
+                                "value": "Grounds",
+                                "id": "307"
+                              },
+                              {
+                                "value": ""
+                              }
+                            ]
+                          },
+                          "Rows": {
+                            "Row": [
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Grounds Unpredictable",
+                                    "id": "314"
+                                  },
+                                  {
+                                    "value": "337.88"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Lighting and electricity",
+                                    "id": "311"
+                                  },
+                                  {
+                                    "value": "267.67"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Parking Improvements",
+                                    "id": "329"
+                                  },
+                                  {
+                                    "value": "214.89"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Pest control",
+                                    "id": "366"
+                                  },
+                                  {
+                                    "value": "1504.20"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Pressure Washer",
+                                    "id": "335"
+                                  },
+                                  {
+                                    "value": "325.91"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Security",
+                                    "id": "310"
+                                  },
+                                  {
+                                    "value": "217.36"
+                                  }
+                                ],
+                                "type": "Data"
+                              }
+                            ]
+                          },
+                          "Summary": {
+                            "ColData": [
+                              {
+                                "value": "Total Grounds"
+                              },
+                              {
+                                "value": "2867.91"
+                              }
+                            ]
+                          },
+                          "type": "Section"
+                        }
+                      ]
+                    },
+                    "Summary": {
+                      "ColData": [
+                        {
+                          "value": "Total Maintenance"
+                        },
+                        {
+                          "value": "12359.73"
+                        }
+                      ]
+                    },
+                    "type": "Section"
+                  },
+                  {
+                    "Header": {
+                      "ColData": [
+                        {
+                          "value": "Meals",
+                          "id": "192"
+                        },
+                        {
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "Rows": {
+                      "Row": [
+                        {
+                          "Header": {
+                            "ColData": [
+                              {
+                                "value": "Celebrations",
+                                "id": "274"
+                              },
+                              {
+                                "value": ""
+                              }
+                            ]
+                          },
+                          "Rows": {
+                            "Row": [
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Community celebrations",
+                                    "id": "378"
+                                  },
+                                  {
+                                    "value": "365.75"
+                                  }
+                                ],
+                                "type": "Data"
+                              }
+                            ]
+                          },
+                          "Summary": {
+                            "ColData": [
+                              {
+                                "value": "Total Celebrations"
+                              },
+                              {
+                                "value": "365.75"
+                              }
+                            ]
+                          },
+                          "type": "Section"
+                        },
+                        {
+                          "Header": {
+                            "ColData": [
+                              {
+                                "value": "Meal Team Meals",
+                                "id": "271"
+                              },
+                              {
+                                "value": ""
+                              }
+                            ]
+                          },
+                          "Rows": {
+                            "Row": [
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Groceries",
+                                    "id": "416"
+                                  },
+                                  {
+                                    "value": "2576.64"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Meal Related Expenses",
+                                    "id": "417"
+                                  },
+                                  {
+                                    "value": "256.87"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Meals Billed to Members",
+                                    "id": "445"
+                                  },
+                                  {
+                                    "value": "-3568.50"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Pantry",
+                                    "id": "406"
+                                  },
+                                  {
+                                    "value": "244.50"
+                                  }
+                                ],
+                                "type": "Data"
+                              }
+                            ]
+                          },
+                          "Summary": {
+                            "ColData": [
+                              {
+                                "value": "Total Meal Team Meals"
+                              },
+                              {
+                                "value": "-490.49"
+                              }
+                            ]
+                          },
+                          "type": "Section"
+                        },
+                        {
+                          "Header": {
+                            "ColData": [
+                              {
+                                "value": "Morning Coffee",
+                                "id": "272"
+                              },
+                              {
+                                "value": ""
+                              }
+                            ]
+                          },
+                          "Rows": {
+                            "Row": [
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Coffee Billed to Members",
+                                    "id": "471"
+                                  },
+                                  {
+                                    "value": "-744.00"
+                                  }
+                                ],
+                                "type": "Data"
+                              },
+                              {
+                                "ColData": [
+                                  {
+                                    "value": "Coffee Purchases",
+                                    "id": "452"
+                                  },
+                                  {
+                                    "value": "570.44"
+                                  }
+                                ],
+                                "type": "Data"
+                              }
+                            ]
+                          },
+                          "Summary": {
+                            "ColData": [
+                              {
+                                "value": "Total Morning Coffee"
+                              },
+                              {
+                                "value": "-173.56"
+                              }
+                            ]
+                          },
+                          "type": "Section"
+                        }
+                      ]
+                    },
+                    "Summary": {
+                      "ColData": [
+                        {
+                          "value": "Total Meals"
+                        },
+                        {
+                          "value": "-298.30"
+                        }
+                      ]
+                    },
+                    "type": "Section"
+                  }
+                ]
+              },
+              "Summary": {
+                "ColData": [
+                  {
+                    "value": "Total Expenses"
+                  },
+                  {
+                    "value": "60623.29"
+                  }
+                ]
+              },
+              "type": "Section"
+            },
+            {
+              "Header": {
+                "ColData": [
+                  {
+                    "value": "Utilities",
+                    "id": "47"
+                  },
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              "Rows": {
+                "Row": [
+                  {
+                    "ColData": [
+                      {
+                        "value": "Electricity",
+                        "id": "253"
+                      },
+                      {
+                        "value": "17280.51"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Natural Gas",
+                        "id": "254"
+                      },
+                      {
+                        "value": "19149.35"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Trash & Recycling",
+                        "id": "64"
+                      },
+                      {
+                        "value": "5721.97"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Water and Sewer",
+                        "id": "49"
+                      },
+                      {
+                        "value": "19606.64"
+                      }
+                    ],
+                    "type": "Data"
+                  }
+                ]
+              },
+              "Summary": {
+                "ColData": [
+                  {
+                    "value": "Total Utilities"
+                  },
+                  {
+                    "value": "61758.47"
+                  }
+                ]
+              },
+              "type": "Section"
+            }
+          ]
+        },
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Total Expenses"
+            },
+            {
+              "value": "122381.76"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "Expenses"
+      },
+      {
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Net Operating Income"
+            },
+            {
+              "value": "33829.88"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "NetOperatingIncome"
+      },
+      {
+        "Header": {
+          "ColData": [
+            {
+              "value": "Other Income"
+            },
+            {
+              "value": ""
+            }
+          ]
+        },
+        "Rows": {
+          "Row": [
+            {
+              "Header": {
+                "ColData": [
+                  {
+                    "value": "Reserve Expenses",
+                    "id": "52"
+                  },
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              "Rows": {
+                "Row": [
+                  {
+                    "ColData": [
+                      {
+                        "value": "Decks-Trex-Repair/Replace",
+                        "id": "283"
+                      },
+                      {
+                        "value": "-20536.90"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Exterior Painting/staining/prep",
+                        "id": "170"
+                      },
+                      {
+                        "value": "-13444.40"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Lighting Exterior - Replace",
+                        "id": "261"
+                      },
+                      {
+                        "value": "-137.31"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Rails Wood - Prep/paint",
+                        "id": "276"
+                      },
+                      {
+                        "value": "-18577.79"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Rails Wood - Replace",
+                        "id": "284"
+                      },
+                      {
+                        "value": "-629.03"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Roof Garages - Replace",
+                        "id": "291"
+                      },
+                      {
+                        "value": "-3402.58"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Stairs Wood - Replace",
+                        "id": "279"
+                      },
+                      {
+                        "value": "-163.35"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Windows, Glass Doors - Replace",
+                        "id": "246"
+                      },
+                      {
+                        "value": "-381.50"
+                      }
+                    ],
+                    "type": "Data"
+                  }
+                ]
+              },
+              "Summary": {
+                "ColData": [
+                  {
+                    "value": "Total Reserve Expenses"
+                  },
+                  {
+                    "value": "-57272.86"
+                  }
+                ]
+              },
+              "type": "Section"
+            },
+            {
+              "Header": {
+                "ColData": [
+                  {
+                    "value": "Reserves Income",
+                    "id": "77"
+                  },
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              "Rows": {
+                "Row": [
+                  {
+                    "ColData": [
+                      {
+                        "value": "Dues-Garage/Carport Reserves",
+                        "id": "363"
+                      },
+                      {
+                        "value": "5980.56"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Dues-Reserve",
+                        "id": "456"
+                      },
+                      {
+                        "value": "110579.88"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Interest Income",
+                        "id": "428"
+                      },
+                      {
+                        "value": "12147.87"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Tax on Interest",
+                        "id": "258"
+                      },
+                      {
+                        "value": "-5400.00"
+                      }
+                    ],
+                    "type": "Data"
+                  },
+                  {
+                    "ColData": [
+                      {
+                        "value": "Unrealized Gain (Loss) Vanguard",
+                        "id": "255"
+                      },
+                      {
+                        "value": "12311.11"
+                      }
+                    ],
+                    "type": "Data"
+                  }
+                ]
+              },
+              "Summary": {
+                "ColData": [
+                  {
+                    "value": "Total Reserves Income"
+                  },
+                  {
+                    "value": "135619.42"
+                  }
+                ]
+              },
+              "type": "Section"
+            }
+          ]
+        },
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Total Other Income"
+            },
+            {
+              "value": "78346.56"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "OtherIncome"
+      },
+      {
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Net Other Income"
+            },
+            {
+              "value": "78346.56"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "NetOtherIncome"
+      },
+      {
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Net Income"
+            },
+            {
+              "value": "112176.44"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "NetIncome"
+      }
+    ]
+  }
+}

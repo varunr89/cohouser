@@ -1,0 +1,499 @@
+{
+  "committees": {
+    "board": {
+      "key": "board",
+      "name": "Board",
+      "description": "Board expenses from QuickBooks.",
+      "actual": 5402.32,
+      "budget": 10927.0,
+      "remaining": 5524.68,
+      "children": [
+        {
+          "label": "Community Building",
+          "actual": 1490.75,
+          "budget": 1775.0,
+          "remaining": 284.25,
+          "children": [
+            {
+              "label": "Annual Campout Reservations",
+              "actual": 176.0,
+              "budget": 275.0,
+              "remaining": 99.0
+            },
+            {
+              "label": "Retreat/25th Anniversary Celebration",
+              "actual": 1314.75,
+              "budget": 1500.0,
+              "remaining": 185.25
+            }
+          ]
+        },
+        {
+          "label": "General Meetings",
+          "actual": 529.32,
+          "budget": 1200.0,
+          "remaining": 670.68,
+          "children": [
+            {
+              "label": "Child Care",
+              "actual": 400.0,
+              "budget": 900.0,
+              "remaining": 500.0
+            },
+            {
+              "label": "GM Snacks",
+              "actual": 129.32,
+              "budget": 300.0,
+              "remaining": 170.68
+            }
+          ]
+        },
+        {
+          "label": "Tech Team",
+          "actual": 3382.25,
+          "budget": 4792.0,
+          "remaining": 1409.75,
+          "children": [
+            {
+              "label": "Gather and Squarespace",
+              "actual": 1270.92,
+              "budget": 1352.0,
+              "remaining": 81.07999999999993
+            },
+            {
+              "label": "Internet access & e-mail",
+              "actual": 1919.07,
+              "budget": 3230.0,
+              "remaining": 1310.93
+            },
+            {
+              "label": "Zoom",
+              "actual": 192.26,
+              "budget": 210.0,
+              "remaining": 17.74000000000001
+            }
+          ]
+        }
+      ]
+    },
+    "commonHouse": {
+      "key": "commonHouse",
+      "name": "Common House",
+      "description": "Common House expenses from QuickBooks.",
+      "actual": 3865.18,
+      "budget": 7050.0,
+      "remaining": 3184.82,
+      "children": [
+        {
+          "label": "AV; piano tuning (entertainment",
+          "actual": 80.0,
+          "budget": 250.0,
+          "remaining": 170.0
+        },
+        {
+          "label": "CH Office Supplies",
+          "actual": 176.38,
+          "budget": 500.0,
+          "remaining": 323.62
+        },
+        {
+          "label": "Cleaning",
+          "actual": 3315.0,
+          "budget": 4425.0,
+          "remaining": 1110.0
+        },
+        {
+          "label": "Donations - CH use",
+          "actual": 1405.0,
+          "budget": -1300.0,
+          "remaining": 0
+        },
+        {
+          "label": "Durables Budget",
+          "actual": 279.31,
+          "budget": 650.0,
+          "remaining": 370.69,
+          "children": [
+            {
+              "label": "Furnishings",
+              "actual": 199.26,
+              "budget": 500.0,
+              "remaining": 300.74
+            },
+            {
+              "label": "Kitchen equipment",
+              "actual": 78.16,
+              "budget": 100.0,
+              "remaining": 21.840000000000003
+            },
+            {
+              "label": "Paint and Painting",
+              "actual": 1.89,
+              "budget": 50.0,
+              "remaining": 48.11
+            }
+          ]
+        },
+        {
+          "label": "Events",
+          "actual": 50.55,
+          "budget": 150.0,
+          "remaining": 99.45
+        },
+        {
+          "label": "Lead paint remediation",
+          "actual": 80.98,
+          "budget": 150.0,
+          "remaining": 69.02
+        },
+        {
+          "label": "Miscellaneous & unintended",
+          "actual": 92.12,
+          "budget": 200.0,
+          "remaining": 107.88
+        },
+        {
+          "label": "Non-Meal Supplies",
+          "actual": 698.53,
+          "budget": 800.0,
+          "remaining": 101.47000000000003
+        },
+        {
+          "label": "Repairs",
+          "actual": 385.95,
+          "budget": 1000.0,
+          "remaining": 614.05
+        },
+        {
+          "label": "Work Party Lunches",
+          "actual": 111.36,
+          "budget": 100.0,
+          "remaining": 0
+        }
+      ]
+    },
+    "finance": {
+      "key": "finance",
+      "name": "Finance Committee",
+      "description": "Finance Committee expenses from QuickBooks.",
+      "actual": 36932.61,
+      "budget": 37010.0,
+      "remaining": 77.38999999999942,
+      "children": [
+        {
+          "label": "Accounting",
+          "actual": 590.0,
+          "budget": 225.0,
+          "remaining": 0
+        },
+        {
+          "label": "Audit/Independent Review",
+          "actual": 2450.0,
+          "budget": 2475.0,
+          "remaining": 25.0
+        },
+        {
+          "label": "Insurance",
+          "actual": 33074.75,
+          "budget": 33600.0,
+          "remaining": 525.25
+        },
+        {
+          "label": "Miscellaneous",
+          "actual": 96.9,
+          "budget": 110.0,
+          "remaining": 13.099999999999994
+        },
+        {
+          "label": "Penalty expense",
+          "actual": 2.0,
+          "budget": 0,
+          "remaining": 0
+        },
+        {
+          "label": "QuickBooks",
+          "actual": 718.96,
+          "budget": 600.0,
+          "remaining": 0
+        }
+      ]
+    },
+    "landscape": {
+      "key": "landscape",
+      "name": "Landscape",
+      "description": "Landscape expenses from QuickBooks.",
+      "actual": 2361.75,
+      "budget": 3150.0,
+      "remaining": 788.25,
+      "children": [
+        {
+          "label": "Fertilizers, soil, mulches",
+          "actual": 161.56,
+          "budget": 350.0,
+          "remaining": 188.44
+        },
+        {
+          "label": "Hardscape",
+          "actual": 357.89,
+          "budget": 150.0,
+          "remaining": 0
+        },
+        {
+          "label": "Plants and trees",
+          "actual": 328.58,
+          "budget": 300.0,
+          "remaining": 0
+        },
+        {
+          "label": "Professional services-Tree Trim",
+          "actual": 1389.75,
+          "budget": 1000.0,
+          "remaining": 0
+        },
+        {
+          "label": "Work party lunches",
+          "actual": 123.97,
+          "budget": 200.0,
+          "remaining": 76.03
+        }
+      ]
+    },
+    "maintenance": {
+      "key": "maintenance",
+      "name": "Maintenance",
+      "description": "Maintenance expenses from QuickBooks.",
+      "actual": 12359.73,
+      "budget": 18935.0,
+      "remaining": 6575.27,
+      "children": [
+        {
+          "label": "Buildings",
+          "actual": 9491.82,
+          "budget": 13225.0,
+          "remaining": 3733.1800000000003,
+          "children": [
+            {
+              "label": "Building Work Party",
+              "actual": 149.73,
+              "budget": 300.0,
+              "remaining": 150.27
+            },
+            {
+              "label": "Buildings Unpredictable",
+              "actual": 713.86,
+              "budget": 4000.0,
+              "remaining": 3286.14
+            },
+            {
+              "label": "Dryer vents",
+              "actual": 379.53,
+              "budget": 375.0,
+              "remaining": 0
+            },
+            {
+              "label": "Materials for painting, etc.",
+              "actual": 95.15,
+              "budget": 600.0,
+              "remaining": 504.85
+            },
+            {
+              "label": "Repairs to heat, water systems",
+              "actual": 568.17,
+              "budget": 3000.0,
+              "remaining": 2431.83
+            },
+            {
+              "label": "Sprinklers, fire extin., bk flo",
+              "actual": 1569.17,
+              "budget": 1150.0,
+              "remaining": 0
+            },
+            {
+              "label": "Upper A Stair Treads",
+              "actual": 190.0,
+              "budget": 1500.0,
+              "remaining": 1310.0
+            },
+            {
+              "label": "Upper gutter cleaning",
+              "actual": 654.0,
+              "budget": 1600.0,
+              "remaining": 946.0
+            },
+            {
+              "label": "Utility repairs",
+              "actual": 5118.85,
+              "budget": 0,
+              "remaining": 0
+            },
+            {
+              "label": "Workshop expenses",
+              "actual": 53.36,
+              "budget": 700.0,
+              "remaining": 646.64
+            }
+          ]
+        },
+        {
+          "label": "Grounds",
+          "actual": 2867.91,
+          "budget": 5710.0,
+          "remaining": 2842.09,
+          "children": [
+            {
+              "label": "Grounds Unpredictable",
+              "actual": 337.88,
+              "budget": 2000.0,
+              "remaining": 1662.12
+            },
+            {
+              "label": "Lighting and electricity",
+              "actual": 267.67,
+              "budget": 500.0,
+              "remaining": 232.32999999999998
+            },
+            {
+              "label": "Parking Improvements",
+              "actual": 214.89,
+              "budget": 0,
+              "remaining": 0
+            },
+            {
+              "label": "Pest control",
+              "actual": 1504.2,
+              "budget": 2860.0,
+              "remaining": 1355.8
+            },
+            {
+              "label": "Pressure Washer",
+              "actual": 325.91,
+              "budget": 350.0,
+              "remaining": 24.089999999999975
+            },
+            {
+              "label": "Security",
+              "actual": 217.36,
+              "budget": 0,
+              "remaining": 0
+            }
+          ]
+        }
+      ]
+    },
+    "meals": {
+      "key": "meals",
+      "name": "Meals",
+      "description": "Meals expenses from QuickBooks.",
+      "actual": 298.3,
+      "budget": 950.0,
+      "remaining": 651.7,
+      "children": [
+        {
+          "label": "Celebrations",
+          "actual": 365.75,
+          "budget": 600.0,
+          "remaining": 234.25,
+          "children": [
+            {
+              "label": "Community celebrations",
+              "actual": 365.75,
+              "budget": 600.0,
+              "remaining": 234.25
+            }
+          ]
+        },
+        {
+          "label": "Meal Team Meals",
+          "actual": 490.49,
+          "budget": 350.0,
+          "remaining": 0,
+          "children": [
+            {
+              "label": "Groceries",
+              "actual": 2576.64,
+              "budget": 0,
+              "remaining": 0
+            },
+            {
+              "label": "Meal Related Expenses",
+              "actual": 256.87,
+              "budget": 0,
+              "remaining": 0
+            },
+            {
+              "label": "Meals Billed to Members",
+              "actual": 3568.5,
+              "budget": 0,
+              "remaining": 0
+            },
+            {
+              "label": "Pantry",
+              "actual": 244.5,
+              "budget": 350.0,
+              "remaining": 105.5
+            }
+          ]
+        },
+        {
+          "label": "Morning Coffee",
+          "actual": 173.56,
+          "budget": 0,
+          "remaining": 0,
+          "children": [
+            {
+              "label": "Coffee Billed to Members",
+              "actual": 744.0,
+              "budget": 0,
+              "remaining": 0
+            },
+            {
+              "label": "Coffee Purchases",
+              "actual": 570.44,
+              "budget": 0,
+              "remaining": 0
+            }
+          ]
+        }
+      ]
+    },
+    "utilities": {
+      "key": "utilities",
+      "name": "Utilities",
+      "description": "Utilities expenses from QuickBooks.",
+      "actual": 61758.47,
+      "budget": 77850.0,
+      "remaining": 16091.529999999999,
+      "children": [
+        {
+          "label": "Electricity",
+          "actual": 17280.51,
+          "budget": 20200.0,
+          "remaining": 2919.4900000000016
+        },
+        {
+          "label": "Natural Gas",
+          "actual": 19149.35,
+          "budget": 24300.0,
+          "remaining": 5150.6500000000015
+        },
+        {
+          "label": "Trash & Recycling",
+          "actual": 5721.97,
+          "budget": 7450.0,
+          "remaining": 1728.0299999999997
+        },
+        {
+          "label": "Water and Sewer",
+          "actual": 19606.64,
+          "budget": 25900.0,
+          "remaining": 6293.360000000001
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "start_period": "2025-01-01",
+    "end_period": "2025-12-05",
+    "budgets_loaded": true
+  }
+}

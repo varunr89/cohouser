@@ -1,0 +1,68 @@
+{
+  "generated_at": "2025-12-05T14:32:03.688517+00:00",
+  "period": "2025-Q4",
+  "report_date": "2025-12-05",
+  "cash_investments": {
+    "bank_accounts": 239047.0,
+    "investments_cds": 392997.91,
+    "total": 632044.9099999999,
+    "change_from_prior": 0
+  },
+  "budget_vs_actual": {
+    "total_budget": 0,
+    "total_actual": 122978.36,
+    "total_remaining": 0,
+    "percent_used": 0,
+    "committees": [
+      {
+        "name": "Board",
+        "actual": 5402.32,
+        "budget": 10927.0,
+        "remaining": 5524.68,
+        "percent": 49.44010249839846
+      },
+      {
+        "name": "Common House",
+        "actual": 3865.18,
+        "budget": 7050.0,
+        "remaining": 3184.82,
+        "percent": 54.82524822695035
+      },
+      {
+        "name": "Finance Committee",
+        "actual": 36932.61,
+        "budget": 37010.0,
+        "remaining": 77.38999999999942,
+        "percent": 99.7908943528776
+      },
+      {
+        "name": "Landscape",
+        "actual": 2361.75,
+        "budget": 3150.0,
+        "remaining": 788.25,
+        "percent": 74.97619047619047
+      },
+      {
+        "name": "Maintenance",
+        "actual": 12359.73,
+        "budget": 18935.0,
+        "remaining": 6575.27,
+        "percent": 65.27451808819646
+      },
+      {
+        "name": "Meals",
+        "actual": 298.3,
+        "budget": 950.0,
+        "remaining": 651.7,
+        "percent": 31.4
+      },
+      {
+        "name": "Utilities",
+        "actual": 61758.47,
+        "budget": 77850.0,
+        "remaining": 16091.529999999999,
+        "percent": 79.33008349389853
+      }
+    ]
+  }
+}

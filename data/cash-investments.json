@@ -1,0 +1,139 @@
+{
+  "bank": {
+    "label": "Bank accounts (cash)",
+    "subtitle": "Bank accounts and CDs held at WECU and First Federal.",
+    "current": 239047.0,
+    "prior": 173736.42,
+    "change": 65310.58,
+    "children": [
+      {
+        "label": "Certificates of Deposit",
+        "current": 162021.21,
+        "prior": 157226.6,
+        "change": 4794.61,
+        "children": [
+          {
+            "label": "WECU 1-yr 5.25% 1/18/26",
+            "current": 61798.32,
+            "prior": 59977.23,
+            "change": 1821.09
+          },
+          {
+            "label": "WECU 2-yr 4.45% 3/6/27",
+            "current": 100222.89,
+            "prior": 97249.37,
+            "change": 2973.52
+          }
+        ]
+      },
+      {
+        "label": "WECU Childcare Checking",
+        "current": 262.05,
+        "prior": 518.3,
+        "change": -256.25
+      },
+      {
+        "label": "WECU Debit Card",
+        "current": 1413.43,
+        "prior": 1158.72,
+        "change": 254.71
+      },
+      {
+        "label": "WECU Main Checking",
+        "current": 22962.15,
+        "prior": 10942.12,
+        "change": 12020.03
+      },
+      {
+        "label": "WECU Main Savings",
+        "current": 50960.62,
+        "prior": 2670.86,
+        "change": 48289.76
+      },
+      {
+        "label": "WECU Meals Checking",
+        "current": 1427.54,
+        "prior": 1119.82,
+        "change": 307.72
+      }
+    ]
+  },
+  "investments": {
+    "label": "Investments & CDs (other current assets)",
+    "subtitle": "Other current assets including CDs and Vanguard funds.",
+    "current": 392997.91,
+    "prior": 373442.77,
+    "change": 19555.14,
+    "children": [
+      {
+        "label": "Petty Cash",
+        "current": 22.92,
+        "prior": 40.39,
+        "change": -17.47
+      },
+      {
+        "label": "Prepaid Income Tax",
+        "current": 205.0,
+        "prior": 205.0,
+        "change": 0.0
+      },
+      {
+        "label": "Vanguard",
+        "current": 392769.99,
+        "prior": 373197.38,
+        "change": 19572.61,
+        "children": [
+          {
+            "label": "Goldman Sachs CD 4.1% 12/31/25",
+            "current": 110024.86,
+            "prior": 110000.0,
+            "change": 24.86
+          },
+          {
+            "label": "Hapoalim NY 3.65% 18 mo 5/17/27",
+            "current": 104000.0,
+            "prior": 0,
+            "change": 104000.0
+          },
+          {
+            "label": "JPMorgan 4.5% 24 mo 1/6/27",
+            "current": 63035.4,
+            "prior": 0,
+            "change": 63035.4
+          },
+          {
+            "label": "Vanguard Bond  (VCEB)",
+            "current": 40222.65,
+            "prior": 37577.14,
+            "change": 2645.51
+          },
+          {
+            "label": "Vanguard Index (VFTAX)",
+            "current": 69272.52,
+            "prior": 58874.09,
+            "change": 10398.43
+          },
+          {
+            "label": "Vanguard Money Market",
+            "current": 6214.56,
+            "prior": 62746.15,
+            "change": -56531.59
+          }
+        ]
+      }
+    ]
+  },
+  "total": {
+    "label": "Total cash + investments",
+    "subtitle": "Total current assets: bank accounts plus investments.",
+    "current": 632044.9099999999,
+    "prior": 547179.1900000001,
+    "change": 84865.72,
+    "children": []
+  },
+  "metadata": {
+    "report_date": "2025-12-05",
+    "prior_date": "2025-01-01",
+    "total_assets": 696052.54
+  }
+}
