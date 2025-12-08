@@ -24,6 +24,36 @@ OUTPUT_FILE = DATA_DIR / "water-bills.json"
 PROCESSED_FILE = DATA_DIR / ".water-processed.json"
 
 
+def load_processed() -> set:
+    """Load set of already-processed PDF filenames."""
+    if not PROCESSED_FILE.exists():
+        return set()
+    with open(PROCESSED_FILE) as f:
+        data = json.load(f)
+    return set(data.get("processed", []))
+
+
+def save_processed(processed: set) -> None:
+    """Save set of processed PDF filenames."""
+    with open(PROCESSED_FILE, "w") as f:
+        json.dump({"processed": sorted(processed)}, f, indent=2)
+
+
+def discover_pdfs() -> list[Path]:
+    """Find all PDF files in the water bill directory."""
+    if not WATER_BILL_DIR.exists():
+        print(f"Error: {WATER_BILL_DIR} does not exist")
+        sys.exit(1)
+    return sorted(WATER_BILL_DIR.glob("*.pdf"))
+
+
+def find_new_pdfs(all_pdfs: list[Path], processed: set, rebuild: bool) -> list[Path]:
+    """Filter to only unprocessed PDFs (or all if rebuild=True)."""
+    if rebuild:
+        return all_pdfs
+    return [p for p in all_pdfs if p.name not in processed]
+
+
 def main():
     parser = argparse.ArgumentParser(description="Water Bill Data Refresh CLI")
     parser.add_argument("--dry-run", action="store_true",
@@ -35,9 +65,21 @@ def main():
 
     args = parser.parse_args()
 
-    print("Water Bill Refresh")
-    print(f"  Data dir: {DATA_DIR}")
-    print(f"  Dry run: {args.dry_run}")
+    # Discover PDFs
+    all_pdfs = discover_pdfs()
+    print(f"Found {len(all_pdfs)} PDF files in {WATER_BILL_DIR}")
+
+    # Load tracking state
+    processed = load_processed()
+    new_pdfs = find_new_pdfs(all_pdfs, processed, args.rebuild)
+
+    if not new_pdfs:
+        print("No new PDFs to process")
+        return
+
+    print(f"Processing {len(new_pdfs)} new PDF(s):")
+    for pdf in new_pdfs:
+        print(f"  - {pdf.name}")
 
 
 if __name__ == "__main__":
