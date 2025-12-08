@@ -11,10 +11,13 @@ Usage:
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+import pdfplumber
 
 # Paths
 SCRIPT_DIR = Path(__file__).parent
@@ -54,6 +57,84 @@ def find_new_pdfs(all_pdfs: list[Path], processed: set, rebuild: bool) -> list[P
     return [p for p in all_pdfs if p.name not in processed]
 
 
+def parse_water_bill(pdf_path: Path) -> dict:
+    """
+    Extract water bill data from a PDF.
+
+    Returns dict with: month, label, bill_date, total, ccf,
+                       sewer_volume, water_volume, fixed_costs, source_file
+
+    Raises ValueError if parsing fails.
+    """
+    with pdfplumber.open(pdf_path) as pdf:
+        text = pdf.pages[0].extract_text()
+
+    if not text:
+        raise ValueError(f"Could not extract text from {pdf_path.name}")
+
+    # Extract bill date (format: MM/DD/YY in BillDate column)
+    # Pattern: "BillDate DueDate..." followed by date line "11/26/24 12/19/24..."
+    date_match = re.search(r"BillDate.*?\n(\d{1,2}/\d{1,2}/\d{2})", text, re.DOTALL)
+    if not date_match:
+        raise ValueError(f"Could not find bill date in {pdf_path.name}")
+
+    bill_date_str = date_match.group(1)
+    bill_date = datetime.strptime(bill_date_str, "%m/%d/%y")
+
+    # Extract total amount due
+    total_match = re.search(r"TotalAmountDue\s+([\d,]+\.\d{2})", text)
+    if not total_match:
+        # Try alternate pattern
+        total_match = re.search(r"TOTALAMOUNTDUE\s+([\d,]+\.\d{2})", text)
+    if not total_match:
+        raise ValueError(f"Could not find total amount in {pdf_path.name}")
+
+    total = float(total_match.group(1).replace(",", ""))
+
+    # Extract consumption (CCF)
+    ccf_match = re.search(r"CONSUMPTION\s+CCF.*?(\d+)\s*$", text, re.MULTILINE)
+    if not ccf_match:
+        # Try finding in meter reading line: "11/14/24 2" 4,837 4,943 106"
+        ccf_match = re.search(r'\d{1,2}/\d{1,2}/\d{2}\s+\d+"\s+[\d,]+\s+[\d,]+\s+(\d+)', text)
+    if not ccf_match:
+        raise ValueError(f"Could not find CCF consumption in {pdf_path.name}")
+
+    ccf = int(ccf_match.group(1))
+
+    # Extract water consumption charge
+    water_match = re.search(r"Water-Consumption@.*?([\d,]+\.\d{2})", text)
+    if not water_match:
+        raise ValueError(f"Could not find water consumption charge in {pdf_path.name}")
+
+    water_volume = float(water_match.group(1).replace(",", ""))
+
+    # Extract sewer volume charge
+    sewer_match = re.search(r"Sewer-Volume@.*?([\d,]+\.\d{2})", text)
+    if not sewer_match:
+        raise ValueError(f"Could not find sewer volume charge in {pdf_path.name}")
+
+    sewer_volume = float(sewer_match.group(1).replace(",", ""))
+
+    # Calculate fixed costs (everything else)
+    fixed_costs = round(total - water_volume - sewer_volume, 2)
+
+    # Generate month key and label
+    month_key = bill_date.strftime("%Y-%m")
+    month_label = bill_date.strftime("%b %y")  # e.g., "Nov 24"
+
+    return {
+        "month": month_key,
+        "label": month_label,
+        "bill_date": bill_date.strftime("%Y-%m-%d"),
+        "total": total,
+        "ccf": ccf,
+        "sewer_volume": sewer_volume,
+        "water_volume": water_volume,
+        "fixed_costs": fixed_costs,
+        "source_file": pdf_path.name
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description="Water Bill Data Refresh CLI")
     parser.add_argument("--dry-run", action="store_true",
@@ -80,6 +161,23 @@ def main():
     print(f"Processing {len(new_pdfs)} new PDF(s):")
     for pdf in new_pdfs:
         print(f"  - {pdf.name}")
+
+    # Parse each new PDF
+    new_entries = []
+    for pdf in new_pdfs:
+        print(f"\nParsing {pdf.name}...")
+        try:
+            entry = parse_water_bill(pdf)
+            print(f"  Bill date: {entry['bill_date']}")
+            print(f"  Total: ${entry['total']:,.2f}")
+            print(f"  CCF: {entry['ccf']}")
+            new_entries.append(entry)
+        except ValueError as e:
+            print(f"\nERROR: {e}")
+            print("Parsing failed. Please check the PDF format.")
+            sys.exit(1)
+
+    print(f"\nSuccessfully parsed {len(new_entries)} bill(s)")
 
 
 if __name__ == "__main__":
