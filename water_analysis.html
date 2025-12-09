@@ -88,24 +88,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>Nov 2024</td><td>$1,978.38</td><td>106</td><td>$776.16</td><td>$271.36</td><td>$930.86</td></tr>
-                                <tr class="table-success table-highlight-success">
-                                    <td>Dec 2024</td><td>$1,602.18</td><td>73</td><td>$514.80</td><td>$186.88</td><td>$900.50</td>
-                                </tr>
-                                <tr class="table-highlight-warning">
-                                    <td>Jan 2025</td><td>$2,020.51</td><td>106</td><td>$793.80</td><td>$276.93</td><td>$949.78</td>
-                                </tr>
-                                <tr><td>Feb 2025</td><td>$1,835.14</td><td>89</td><td>$660.96</td><td>$234.07</td><td>$940.11</td></tr>
-                                <tr><td>Mar 2025</td><td>$2,163.58</td><td>117</td><td>$889.44</td><td>$307.71</td><td>$966.43</td></tr>
-                                <tr><td>Apr 2025</td><td>$1,717.84</td><td>79</td><td>$579.36</td><td>$207.77</td><td>$930.71</td></tr>
-                                <tr><td>May 2025</td><td>$1,964.17</td><td>100</td><td>$750.72</td><td>$263.00</td><td>$950.45</td></tr>
-                                <tr><td>Jun 2025</td><td>$1,975.90</td><td>101</td><td>$758.88</td><td>$265.63</td><td>$951.39</td></tr>
-                                <tr><td>Jul 2025</td><td>$2,515.48</td><td>147</td><td>$1,134.24</td><td>$386.61</td><td>$994.63</td></tr>
-                                <tr class="table-danger table-highlight-danger">
-                                    <td>Aug 2025</td><td>$2,972.95</td><td>186</td><td>$1,452.48</td><td>$489.18</td><td>$1,031.29</td>
-                                </tr>
-                                <tr><td>Sep 2025</td><td>$2,316.07</td><td>130</td><td>$995.52</td><td>$341.90</td><td>$978.65</td></tr>
-                                <tr><td>Oct 2025</td><td>$2,163.58</td><td>117</td><td>$889.44</td><td>$307.71</td><td>$966.43</td></tr>
+                                <!-- Populated dynamically from JSON -->
                             </tbody>
                         </table>
                     </div>
@@ -116,83 +99,161 @@
 </div>
 
 <script>
-    // Chart Configuration
-    const ctx = document.getElementById('mainChart').getContext('2d');
-    
-    const labels = ['Nov 24', 'Dec 24', 'Jan 25', 'Feb 25', 'Mar 25', 'Apr 25', 'May 25', 'Jun 25', 'Jul 25', 'Aug 25', 'Sep 25', 'Oct 25'];
-    const consumptionData = [106, 73, 106, 89, 117, 79, 100, 101, 147, 186, 130, 117];
-    
-    const sewerVol = [776.16, 514.80, 793.80, 660.96, 889.44, 579.36, 750.72, 758.88, 1134.24, 1452.48, 995.52, 889.44];
-    const waterVol = [271.36, 186.88, 276.93, 234.07, 307.71, 207.77, 263.00, 265.63, 386.61, 489.18, 341.90, 307.71];
-    const fixedCosts = [930.86, 900.50, 949.78, 940.11, 966.43, 930.71, 950.45, 951.39, 994.63, 1031.29, 978.65, 966.43];
+    async function loadAndRenderData() {
+        try {
+            const response = await fetch('data/water-bills.json');
+            if (!response.ok) {
+                throw new Error(`Failed to load data: ${response.status}`);
+            }
+            const data = await response.json();
+            const bills = data.bills;
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Consumption (CCF)',
-                    data: consumptionData,
-                    type: 'line',
-                    borderColor: '#2c3e50',
-                    borderWidth: 4,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#2c3e50',
-                    pointRadius: 6,
-                    yAxisID: 'y_consumption',
-                    tension: 0.2,
-                    order: 0
-                },
-                {
-                    label: 'Sewer Volume Charges ($)',
-                    data: sewerVol,
-                    backgroundColor: '#e74c3c',
-                    stack: 'Stack 0',
-                    order: 1
-                },
-                {
-                    label: 'Water Volume Charges ($)',
-                    data: waterVol,
-                    backgroundColor: '#3498db',
-                    stack: 'Stack 0',
-                    order: 1
-                },
-                {
-                    label: 'Fixed Fees ($)',
-                    data: fixedCosts,
-                    backgroundColor: '#95a5a6',
-                    stack: 'Stack 0',
-                    order: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'top', labels: { font: { size: 14 } } },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    callbacks: {
-                        footer: (tooltipItems) => {
-                            let total = 0;
-                            tooltipItems.forEach((item) => {
-                                if (item.dataset.type !== 'line') total += item.parsed.y;
-                            });
-                            return 'Total Cost: $' + total.toFixed(2);
+            // Sort by month to ensure correct order
+            bills.sort((a, b) => a.month.localeCompare(b.month));
+
+            // Build arrays for chart
+            const labels = bills.map(b => b.label);
+            const consumptionData = bills.map(b => b.ccf);
+            const sewerVol = bills.map(b => b.sewer_volume);
+            const waterVol = bills.map(b => b.water_volume);
+            const fixedCosts = bills.map(b => b.fixed_costs);
+
+            // Update header with date range
+            const firstMonth = bills[0]?.label || '';
+            const lastMonth = bills[bills.length - 1]?.label || '';
+            document.querySelector('h2 span').textContent = `| ${firstMonth} - ${lastMonth}`;
+
+            // Render chart
+            renderChart(labels, consumptionData, sewerVol, waterVol, fixedCosts);
+
+            // Render table
+            renderTable(bills);
+
+        } catch (error) {
+            console.error('Error loading water bill data:', error);
+            document.querySelector('.container-fluid').innerHTML = `
+                <div class="alert alert-danger m-4">
+                    <h4>Error Loading Data</h4>
+                    <p>${error.message}</p>
+                    <p>Make sure to serve this page via HTTP (e.g., <code>python -m http.server</code>)</p>
+                </div>
+            `;
+        }
+    }
+
+    function renderChart(labels, consumptionData, sewerVol, waterVol, fixedCosts) {
+        const ctx = document.getElementById('mainChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Consumption (CCF)',
+                        data: consumptionData,
+                        type: 'line',
+                        borderColor: '#2c3e50',
+                        borderWidth: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#2c3e50',
+                        pointRadius: 6,
+                        yAxisID: 'y_consumption',
+                        tension: 0.2,
+                        order: 0
+                    },
+                    {
+                        label: 'Sewer Volume Charges ($)',
+                        data: sewerVol,
+                        backgroundColor: '#e74c3c',
+                        stack: 'Stack 0',
+                        order: 1
+                    },
+                    {
+                        label: 'Water Volume Charges ($)',
+                        data: waterVol,
+                        backgroundColor: '#3498db',
+                        stack: 'Stack 0',
+                        order: 1
+                    },
+                    {
+                        label: 'Fixed Fees ($)',
+                        data: fixedCosts,
+                        backgroundColor: '#95a5a6',
+                        stack: 'Stack 0',
+                        order: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { font: { size: 14 } } },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            footer: (tooltipItems) => {
+                                let total = 0;
+                                tooltipItems.forEach((item) => {
+                                    if (item.dataset.type !== 'line') total += item.parsed.y;
+                                });
+                                return 'Total Cost: $' + total.toFixed(2);
+                            }
                         }
                     }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 14, weight: 'bold' } } },
+                    y: { stacked: true, position: 'left', title: { display: true, text: 'Cost ($)', font: { size: 16 } } },
+                    y_consumption: { position: 'right', title: { display: true, text: 'Usage (CCF)', font: { size: 16 } }, grid: { drawOnChartArea: false } }
                 }
-            },
-            scales: {
-                x: { grid: { display: false }, ticks: { font: { size: 14, weight: 'bold' } } },
-                y: { stacked: true, position: 'left', title: { display: true, text: 'Cost ($)', font: { size: 16 } } },
-                y_consumption: { position: 'right', title: { display: true, text: 'Usage (CCF)', font: { size: 16 } }, grid: { drawOnChartArea: false } }
             }
-        }
-    });
+        });
+    }
+
+    function renderTable(bills) {
+        const tbody = document.querySelector('table tbody');
+
+        // Find min and max for highlighting
+        const totals = bills.map(b => b.total);
+        const minTotal = Math.min(...totals);
+        const maxTotal = Math.max(...totals);
+
+        // Generate rows
+        const rows = bills.map(bill => {
+            // Determine highlighting
+            let rowClass = '';
+            if (bill.total === minTotal) {
+                rowClass = 'table-success table-highlight-success';
+            } else if (bill.total === maxTotal) {
+                rowClass = 'table-danger table-highlight-danger';
+            }
+
+            // Format month for display (convert 2024-11 label "Nov 24" to "Nov 2024")
+            const [year, month] = bill.month.split('-');
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const displayMonth = `${monthNames[parseInt(month) - 1]} ${year}`;
+
+            return `
+                <tr class="${rowClass}">
+                    <td>${displayMonth}</td>
+                    <td>$${bill.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                    <td>${bill.ccf}</td>
+                    <td>$${bill.sewer_volume.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                    <td>$${bill.water_volume.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                    <td>$${bill.fixed_costs.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                </tr>
+            `;
+        }).join('');
+
+        tbody.innerHTML = rows;
+    }
+
+    // Load data when page loads
+    document.addEventListener('DOMContentLoaded', loadAndRenderData);
 </script>
 
 </body>
