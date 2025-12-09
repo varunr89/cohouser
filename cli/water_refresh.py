@@ -180,6 +180,50 @@ def write_output(bills: list, dry_run: bool) -> None:
     print(f"\nWritten {len(bills)} bills to {OUTPUT_FILE}")
 
 
+def git_commit_and_push(dry_run: bool, no_push: bool) -> None:
+    """Commit changes to git and optionally push."""
+    if dry_run:
+        print("\n[Dry run] Would commit and push changes")
+        return
+
+    try:
+        # Stage data files
+        subprocess.run(["git", "add", "data/water-bills.json", "data/.water-processed.json"],
+                       check=True, cwd=SCRIPT_DIR.parent)
+
+        # Check if there are changes
+        result = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            cwd=SCRIPT_DIR.parent
+        )
+
+        if result.returncode == 0:
+            print("\nNo changes to commit")
+            return
+
+        # Commit
+        date_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        commit_msg = f"data: update water bills {date_str}"
+        subprocess.run(
+            ["git", "commit", "-m", commit_msg],
+            check=True,
+            cwd=SCRIPT_DIR.parent
+        )
+        print(f"\nCommitted: {commit_msg}")
+
+        # Push
+        if no_push:
+            print("[No push] Changes committed locally only")
+        else:
+            subprocess.run(["git", "push"], check=True, cwd=SCRIPT_DIR.parent)
+            print("Pushed to remote")
+
+    except subprocess.CalledProcessError as e:
+        print(f"\nGit error: {e}")
+        print("Changes saved but not committed")
+        sys.exit(1)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Water Bill Data Refresh CLI")
     parser.add_argument("--dry-run", action="store_true",
@@ -237,6 +281,11 @@ def main():
             processed.add(pdf.name)
         save_processed(processed)
         print(f"Updated tracking file: {len(processed)} PDFs processed")
+
+    # Git commit and push
+    git_commit_and_push(args.dry_run, args.no_push)
+
+    print("\nDone!")
 
 
 if __name__ == "__main__":
