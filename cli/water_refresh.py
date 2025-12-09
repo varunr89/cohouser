@@ -101,15 +101,16 @@ def parse_water_bill(pdf_path: Path) -> dict:
 
     ccf = int(ccf_match.group(1))
 
-    # Extract water consumption charge
-    water_match = re.search(r"Water-Consumption@.*?([\d,]+\.\d{2})", text)
+    # Extract water consumption charge (format: "Water-Consumption@$2.56/ccf 271.36")
+    # Need to skip the rate and get the final amount
+    water_match = re.search(r"Water-Consumption@\$[\d.]+/ccf\s+([\d,]+\.\d{2})", text)
     if not water_match:
         raise ValueError(f"Could not find water consumption charge in {pdf_path.name}")
 
     water_volume = float(water_match.group(1).replace(",", ""))
 
-    # Extract sewer volume charge
-    sewer_match = re.search(r"Sewer-Volume@.*?([\d,]+\.\d{2})", text)
+    # Extract sewer volume charge (format: "Sewer-Volume@$7.92/ccf 776.16")
+    sewer_match = re.search(r"Sewer-Volume@\$[\d.]+/ccf\s+([\d,]+\.\d{2})", text)
     if not sewer_match:
         raise ValueError(f"Could not find sewer volume charge in {pdf_path.name}")
 
@@ -133,6 +134,50 @@ def parse_water_bill(pdf_path: Path) -> dict:
         "fixed_costs": fixed_costs,
         "source_file": pdf_path.name
     }
+
+
+def load_existing_bills() -> list:
+    """Load existing bills from JSON file."""
+    if not OUTPUT_FILE.exists():
+        return []
+    with open(OUTPUT_FILE) as f:
+        data = json.load(f)
+    return data.get("bills", [])
+
+
+def merge_bills(existing: list, new_entries: list) -> list:
+    """
+    Merge new entries into existing bills.
+
+    Replaces entries with same month (for --rebuild case).
+    Returns sorted list by month.
+    """
+    # Index existing by month
+    by_month = {b["month"]: b for b in existing}
+
+    # Add/replace with new entries
+    for entry in new_entries:
+        by_month[entry["month"]] = entry
+
+    # Sort by month
+    return sorted(by_month.values(), key=lambda b: b["month"])
+
+
+def write_output(bills: list, dry_run: bool) -> None:
+    """Write bills to JSON output file."""
+    if dry_run:
+        print("\n[Dry run] Would write to", OUTPUT_FILE)
+        return
+
+    output = {
+        "bills": bills,
+        "last_updated": datetime.now(timezone.utc).isoformat()
+    }
+
+    with open(OUTPUT_FILE, "w") as f:
+        json.dump(output, f, indent=2)
+
+    print(f"\nWritten {len(bills)} bills to {OUTPUT_FILE}")
 
 
 def main():
@@ -178,6 +223,20 @@ def main():
             sys.exit(1)
 
     print(f"\nSuccessfully parsed {len(new_entries)} bill(s)")
+
+    # Load existing and merge
+    existing_bills = load_existing_bills()
+    all_bills = merge_bills(existing_bills, new_entries)
+
+    # Write output
+    write_output(all_bills, args.dry_run)
+
+    # Update tracking file
+    if not args.dry_run:
+        for pdf in new_pdfs:
+            processed.add(pdf.name)
+        save_processed(processed)
+        print(f"Updated tracking file: {len(processed)} PDFs processed")
 
 
 if __name__ == "__main__":
