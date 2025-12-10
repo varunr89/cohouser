@@ -163,6 +163,11 @@
       box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25);
     }
 
+    .dot.warning {
+      background: #fbbf24;
+      box-shadow: 0 0 6px rgba(251, 191, 36, 0.6);
+    }
+
     .app-main {
       flex: 1;
       max-width: 1200px;
@@ -1103,12 +1108,16 @@
       return committees;
     }
 
+    // Azure Blob Storage configuration
+    const BLOB_BASE_URL = 'https://cohouserstorage.blob.core.windows.net/qb-data/latest';
+
     async function loadDashboardData() {
       try {
         // Load both JSON files in parallel
-        const [cashResponse, budgetResponse] = await Promise.all([
-          fetch('data/cash-investments.json'),
-          fetch('data/budget-vs-actual.json')
+        const [cashResponse, budgetResponse, statusResponse] = await Promise.all([
+          fetch(`${BLOB_BASE_URL}/cash-investments.json`),
+          fetch(`${BLOB_BASE_URL}/budget-vs-actual.json`),
+          fetch(`${BLOB_BASE_URL}/status.json`).catch(() => null)
         ]);
 
         if (!cashResponse.ok) {
@@ -1132,6 +1141,12 @@
         const endPeriod = budgetData.metadata?.end_period;
         if (reportDate) {
           updateHeaderDate(reportDate, startPeriod, endPeriod);
+        }
+
+        // Handle refresh status
+        if (statusResponse && statusResponse.ok) {
+          const statusData = await statusResponse.json();
+          updateRefreshStatus(statusData);
         }
 
         return true;
@@ -1187,6 +1202,31 @@
 
       // Update cash column labels with the actual report date
       updateCashColumnLabels(dateStr);
+    }
+
+    function updateRefreshStatus(status) {
+      const headerPill = document.querySelector('.header-pill');
+      if (!headerPill) return;
+
+      if (status.status === 'failed') {
+        // Show warning for failed refresh
+        const lastSuccess = status.last_success ? new Date(status.last_success) : null;
+        const lastSuccessStr = lastSuccess
+          ? lastSuccess.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+          : 'unknown';
+        headerPill.innerHTML = `<span class="dot warning"></span>Update failed · Last success: ${lastSuccessStr}`;
+        headerPill.style.background = 'rgba(185, 28, 28, 0.35)';
+      } else if (status.status === 'success' && status.last_success) {
+        // Check if data is stale (>48 hours)
+        const lastSuccess = new Date(status.last_success);
+        const hoursAgo = (Date.now() - lastSuccess.getTime()) / (1000 * 60 * 60);
+
+        if (hoursAgo > 48) {
+          headerPill.innerHTML = `<span class="dot warning"></span>Data may be stale · ${Math.floor(hoursAgo / 24)}d old`;
+          headerPill.style.background = 'rgba(180, 130, 0, 0.35)';
+        }
+        // Otherwise, updateHeaderDate already set the success state
+      }
     }
 
     function showLoadError(message) {
