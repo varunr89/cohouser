@@ -228,9 +228,9 @@ def refresh_data(timer: func.TimerRequest) -> None:
         transactions_raw = qb_core.fetch_transactions(access_token, realm_id, start_of_year, end_date)
         accounts_raw = qb_core.fetch_accounts(access_token, realm_id)
 
-        # Transform data
-        budgets = qb_core.parse_budgets(budgets_raw)
+        # Transform data - build account mapping first for budget resolution
         account_mapping = qb_core.build_account_mapping(accounts_raw)
+        budgets = qb_core.parse_budgets(budgets_raw, account_mapping)
 
         cash_data = qb_core.transform_balance_sheet(balance_sheet, balance_sheet_prior)
         budget_data = qb_core.transform_profit_and_loss(profit_loss, budgets)

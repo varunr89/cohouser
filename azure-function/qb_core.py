@@ -340,17 +340,19 @@ def build_account_mapping(accounts_data: dict) -> dict:
 # Budget Parsing
 # ============================================================================
 
-def parse_budgets(budget_response: dict) -> dict:
+def parse_budgets(budget_response: dict, account_mapping: dict = None) -> dict:
     """
-    Parse QuickBooks Budget entity response into a lookup by account name.
+    Parse QuickBooks Budget entity response into a lookup by full account path.
 
     Args:
         budget_response: Budget query response from fetch_budgets()
+        account_mapping: Optional dict with 'by_id' mapping account IDs to full paths
 
     Returns:
-        Dict like: {"Utilities": 77850, "Board": 10927, ...}
+        Dict like: {"Expenses:Board:Tech Team:Internet access": 3230, ...}
     """
     budgets_by_account = {}
+    by_id = account_mapping.get("by_id", {}) if account_mapping else {}
 
     # Get budgets from QueryResponse
     budgets = budget_response.get("QueryResponse", {}).get("Budget", [])
@@ -384,12 +386,23 @@ def parse_budgets(budget_response: dict) -> dict:
     # Extract budget details by account
     for detail in target_budget.get("BudgetDetail", []):
         account_ref = detail.get("AccountRef", {})
+        account_id = account_ref.get("value", "")
         account_name = account_ref.get("name", "")
         amount = detail.get("Amount", 0)
 
-        if account_name and amount:
+        if not amount:
+            continue
+
+        # Try to resolve account ID to full path, fall back to name
+        if account_id and account_id in by_id:
+            full_path = by_id[account_id]
+        else:
+            # Fall back to name (may be short or full depending on QB response)
+            full_path = account_name
+
+        if full_path:
             # Accumulate amounts for the same account (monthly entries sum to annual)
-            budgets_by_account[account_name] = budgets_by_account.get(account_name, 0) + float(amount)
+            budgets_by_account[full_path] = budgets_by_account.get(full_path, 0) + float(amount)
 
     return budgets_by_account
 
