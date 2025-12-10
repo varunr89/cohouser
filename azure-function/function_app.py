@@ -4,7 +4,8 @@ import os
 import json
 import requests
 from datetime import datetime, timezone
-from azure.storage.blob import BlobServiceClient
+from azure.storage.blob import BlobServiceClient, ContentSettings
+import qb_core
 
 app = func.FunctionApp()
 
@@ -177,3 +178,143 @@ def create_error_html(error: str) -> str:
     </body>
     </html>
     """
+
+
+@app.timer_trigger(schedule="0 0 14 * * *", arg_name="timer", run_on_startup=False)
+def refresh_data(timer: func.TimerRequest) -> None:
+    """Refresh QuickBooks data daily at 6 AM Pacific (14:00 UTC)."""
+    logging.info("Starting scheduled data refresh")
+
+    status = {
+        "last_attempt": datetime.now(timezone.utc).isoformat(),
+        "status": "running",
+        "error": None
+    }
+
+    try:
+        # Load configuration
+        client_id = os.environ["QB_CLIENT_ID"]
+        client_secret = os.environ["QB_CLIENT_SECRET"]
+        realm_id = os.environ["QB_REALM_ID"]
+        connection_string = os.environ["AZURE_STORAGE_CONNECTION_STRING"]
+
+        # Get tokens from blob storage
+        tokens = load_tokens(connection_string, realm_id)
+
+        # Refresh access token
+        new_tokens = qb_core.refresh_access_token(
+            client_id, client_secret, tokens["refresh_token"]
+        )
+
+        # Save updated tokens back to blob
+        save_tokens(connection_string, realm_id, {
+            **tokens,
+            "access_token": new_tokens["access_token"],
+            "refresh_token": new_tokens["refresh_token"],
+            "token_refreshed_at": datetime.now(timezone.utc).isoformat()
+        })
+
+        access_token = new_tokens["access_token"]
+
+        # Fetch data from QuickBooks
+        year = datetime.now().year
+        start_of_year = f"{year}-01-01"
+        end_date = datetime.now().strftime("%Y-%m-%d")
+
+        balance_sheet = qb_core.fetch_balance_sheet(access_token, realm_id)
+        balance_sheet_prior = qb_core.fetch_balance_sheet_prior(access_token, realm_id, start_of_year)
+        profit_loss = qb_core.fetch_profit_and_loss(access_token, realm_id)
+        budgets_raw = qb_core.fetch_budgets(access_token, realm_id)
+        transactions_raw = qb_core.fetch_transactions(access_token, realm_id, start_of_year, end_date)
+        accounts_raw = qb_core.fetch_accounts(access_token, realm_id)
+
+        # Transform data
+        budgets = qb_core.parse_budgets(budgets_raw)
+        account_mapping = qb_core.build_account_mapping(accounts_raw)
+
+        cash_data = qb_core.transform_balance_sheet(balance_sheet, balance_sheet_prior)
+        budget_data = qb_core.transform_profit_and_loss(profit_loss, budgets)
+        transactions_data = qb_core.transform_transactions(transactions_raw, account_mapping)
+        summary_data = qb_core.create_summary(cash_data, budget_data)
+
+        # Write to blob storage
+        today = datetime.now().strftime("%Y-%m-%d")
+        write_data_to_blob(connection_string, cash_data, budget_data, transactions_data, summary_data, today)
+
+        # Update status
+        status["last_success"] = datetime.now(timezone.utc).isoformat()
+        status["status"] = "success"
+        status["data_date"] = today
+
+        logging.info(f"Data refresh completed successfully for {today}")
+
+    except Exception as e:
+        logging.error(f"Data refresh failed: {e}")
+        status["status"] = "failed"
+        status["error"] = str(e)
+
+    # Always write status (even on failure)
+    try:
+        write_status_to_blob(os.environ["AZURE_STORAGE_CONNECTION_STRING"], status)
+    except Exception as e:
+        logging.error(f"Failed to write status: {e}")
+
+
+def load_tokens(connection_string: str, realm_id: str) -> dict:
+    """Load tokens from blob storage."""
+    blob_service = BlobServiceClient.from_connection_string(connection_string)
+    container_client = blob_service.get_container_client("qb-tokens")
+    blob_client = container_client.get_blob_client(f"{realm_id}/tokens.json")
+    blob_data = blob_client.download_blob().readall()
+    return json.loads(blob_data)
+
+
+def save_tokens(connection_string: str, realm_id: str, tokens: dict) -> None:
+    """Save tokens to blob storage."""
+    blob_service = BlobServiceClient.from_connection_string(connection_string)
+    container_client = blob_service.get_container_client("qb-tokens")
+    blob_client = container_client.get_blob_client(f"{realm_id}/tokens.json")
+    blob_client.upload_blob(json.dumps(tokens, indent=2), overwrite=True)
+
+
+def write_data_to_blob(connection_string: str, cash_data: dict, budget_data: dict,
+                       transactions_data: dict, summary_data: dict, date_str: str) -> None:
+    """Write all data files to blob storage."""
+    blob_service = BlobServiceClient.from_connection_string(connection_string)
+
+    # Ensure container exists with public access
+    container_client = blob_service.get_container_client("qb-data")
+    try:
+        container_client.create_container(public_access="blob")
+    except Exception:
+        pass  # Container exists
+
+    files = {
+        "cash-investments.json": cash_data,
+        "budget-vs-actual.json": budget_data,
+        "transactions.json": transactions_data,
+        "summary.json": summary_data,
+    }
+
+    for filename, data in files.items():
+        content = json.dumps(data, indent=2)
+
+        # Write to latest/
+        blob_client = container_client.get_blob_client(f"latest/{filename}")
+        blob_client.upload_blob(content, overwrite=True, content_settings=ContentSettings(content_type="application/json"))
+
+        # Write to history/{date}/
+        blob_client = container_client.get_blob_client(f"history/{date_str}/{filename}")
+        blob_client.upload_blob(content, overwrite=True, content_settings=ContentSettings(content_type="application/json"))
+
+
+def write_status_to_blob(connection_string: str, status: dict) -> None:
+    """Write status.json to blob storage."""
+    blob_service = BlobServiceClient.from_connection_string(connection_string)
+    container_client = blob_service.get_container_client("qb-data")
+    blob_client = container_client.get_blob_client("latest/status.json")
+    blob_client.upload_blob(
+        json.dumps(status, indent=2),
+        overwrite=True,
+        content_settings=ContentSettings(content_type="application/json")
+    )
