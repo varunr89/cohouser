@@ -802,11 +802,12 @@
       <section aria-label="Cash and investments summary">
         <h1 class="section-heading">Cash &amp; investments</h1>
         <p class="section-subheading">
-          Click any card to drill into the underlying bank and investment accounts.
+          Total of all bank accounts and investments. Expand the rows below to see details.
         </p>
 
-        <div class="cash-summary-grid">
-          <article class="cash-card active" data-cash-root="bank">
+        <div class="cash-summary-grid" style="grid-template-columns: minmax(0, 400px); justify-content: start;">
+          <!-- Bank accounts card (hidden - data preserved) -->
+          <article class="cash-card" data-cash-root="bank" style="display: none;">
             <div class="cash-card-label">Bank accounts (cash)</div>
             <div class="cash-card-main">
               <div class="cash-card-value" data-cash-current="bank">$190,774</div>
@@ -817,7 +818,8 @@
             </div>
           </article>
 
-          <article class="cash-card" data-cash-root="investments">
+          <!-- Investments card (hidden - data preserved) -->
+          <article class="cash-card" data-cash-root="investments" style="display: none;">
             <div class="cash-card-label">Investments &amp; CDs</div>
             <div class="cash-card-main">
               <div class="cash-card-value" data-cash-current="investments">$370,793</div>
@@ -828,7 +830,7 @@
             </div>
           </article>
 
-          <article class="cash-card" data-cash-root="total">
+          <article class="cash-card active" data-cash-root="total">
             <div class="cash-card-label">Total cash + investments</div>
             <div class="cash-card-main">
               <div class="cash-card-value" data-cash-current="total">$557,155</div>
@@ -1440,8 +1442,8 @@
         });
       });
 
-      // default selection
-      selectCashRoot("bank");
+      // default selection - show total with bank/investments as children
+      selectCashRoot("total");
     }
 
     // ------------------------- Committees ---------------------------------
